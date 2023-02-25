@@ -13,10 +13,6 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "requests",
-    "pydantic",
-    "python-dateutil",
-    "typing-extensions",
-    "dataclasses",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
