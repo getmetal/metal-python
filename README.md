@@ -13,9 +13,9 @@ pip install metal-sdk
 
 ```python
   metal = MetalSDK("api_key", "client_id", "app_id");
-  meta.index({ text: 'a' })
-  meta.index({ text: 'b' })
-  meta.index({ text: 'c' })
+  metal.index({ text: 'a' })
+  metal.index({ text: 'b' })
+  metal.index({ text: 'c' })
 ```
 
 ## Contributing
