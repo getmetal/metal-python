@@ -12,7 +12,10 @@ pip install metal-sdk
 ## Usage
 
 ```python
-  metal = MetalSDK("api_key", "client_id", "app_id");
+  from metal_sdk.Metal import Metal
+
+
+  metal = Metal("api_key", "client_id", "app_id");
   metal.index({ text: 'a' })
   metal.index({ text: 'b' })
   metal.index({ text: 'c' })
