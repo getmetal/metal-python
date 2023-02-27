@@ -1,7 +1,7 @@
 # 🤘 Metal Python SDK
 
-[**Developer Documentation**](https://docs.getmetal.io/sdk-python)
-[**PyPi Package**](https://pypi.org/project/metal-sdk/)
+- [**Developer Documentation**](https://docs.getmetal.io/sdk-python)
+- [**PyPi Package**](https://pypi.org/project/metal-sdk/)
 
 ## Setup
 
