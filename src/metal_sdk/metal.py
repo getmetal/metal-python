@@ -1,5 +1,5 @@
 import requests
-from src.metal_sdk.typings import IndexPayload, SearchPayload, TunePayload
+from .typings import IndexPayload, SearchPayload, TunePayload
 
 BASE_API = 'https://api.getmetal.io/v1'
 
