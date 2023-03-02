@@ -48,8 +48,8 @@ class TestMetal(TestCase):
 
         self.assertEqual(mocked_post.call_count, 1)
         self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/index')
-        self.assertEqual(mocked_post.call_args[1]['data']['app'], my_app)
-        self.assertEqual(mocked_post.call_args[1]['data']['text'], payload['text'])
+        self.assertEqual(mocked_post.call_args[1]['json']['app'], my_app)
+        self.assertEqual(mocked_post.call_args[1]['json']['text'], payload['text'])
     
     @mock.patch('requests.post')
     def test_metal_search_without_app(self, mocked_post):
@@ -79,8 +79,8 @@ class TestMetal(TestCase):
 
         self.assertEqual(mocked_post.call_count, 1)
         self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/search')
-        self.assertEqual(mocked_post.call_args[1]['data']['app'], my_app)
-        self.assertEqual(mocked_post.call_args[1]['data']['text'], payload['text'])
+        self.assertEqual(mocked_post.call_args[1]['json']['app'], my_app)
+        self.assertEqual(mocked_post.call_args[1]['json']['text'], payload['text'])
 
     @mock.patch('requests.post')
     def test_metal_tune_without_app(self, mocked_post):
@@ -110,6 +110,6 @@ class TestMetal(TestCase):
 
         self.assertEqual(mocked_post.call_count, 1)
         self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/apps/app-id/tunings')
-        self.assertEqual(mocked_post.call_args[1]['data']['idA'], payload['idA'])
-        self.assertEqual(mocked_post.call_args[1]['data']['idB'], payload['idB'])
-        self.assertEqual(mocked_post.call_args[1]['data']['label'], payload['label'])
+        self.assertEqual(mocked_post.call_args[1]['json']['idA'], payload['idA'])
+        self.assertEqual(mocked_post.call_args[1]['json']['idB'], payload['idB'])
+        self.assertEqual(mocked_post.call_args[1]['json']['label'], payload['label'])
