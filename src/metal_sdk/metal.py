@@ -47,7 +47,7 @@ class Metal:
     app = self.app_id or app_id
     self.__validateIndexAndSearch(app, payload)
     data = self.__getData(app, payload)
-    r = requests.post(BASE_API + '/index', data=data, headers=headers)
+    r = requests.post(BASE_API + '/index', json=data, headers=headers)
     return r.json()
   
   def search(self, payload: SearchPayload = {}, app_id = None):
@@ -56,7 +56,7 @@ class Metal:
     self.__validateIndexAndSearch(app, payload)
     data = self.__getData(app, payload)
 
-    r =  requests.post(BASE_API + '/search', data=data, headers=headers)
+    r =  requests.post(BASE_API + '/search', json=data, headers=headers)
     return r.json()
   
   def tune(self, payload: TunePayload = {}, app_id = None):
@@ -76,5 +76,5 @@ class Metal:
 
     url = BASE_API + '/apps/' + app + '/tunings'
     data = { 'idA': idA, 'idB': idB, 'label': label }
-    r =  requests.post(url, data=data, headers=headers)
+    r =  requests.post(url, json=data, headers=headers)
     return r.json()
