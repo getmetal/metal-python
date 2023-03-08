@@ -74,7 +74,7 @@ class Metal:
   
     
 
-    url = BASE_API + '/apps/' + app + '/tunings'
-    data = { 'idA': idA, 'idB': idB, 'label': label }
+    url = BASE_API + '/tune'
+    data = { 'app': app, 'idA': idA, 'idB': idB, 'label': label }
     r =  requests.post(url, json=data, headers=headers)
     return r.json()

@@ -99,8 +99,8 @@ class TestMetal(TestCase):
 
     @mock.patch('requests.post')
     def test_metal_tune_with_payload(self, mocked_post):
-        app_id = 'app-id'
         payload = {
+            'app': 'app-id',
             'idA': 'id-a',
             'idB': 'id-b',
             'label': -1
@@ -109,7 +109,8 @@ class TestMetal(TestCase):
         metal.tune(payload)
 
         self.assertEqual(mocked_post.call_count, 1)
-        self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/apps/app-id/tunings')
+        self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/tune')
+        self.assertEqual(mocked_post.call_args[1]['json']['app'], payload['app-id'])
         self.assertEqual(mocked_post.call_args[1]['json']['idA'], payload['idA'])
         self.assertEqual(mocked_post.call_args[1]['json']['idB'], payload['idB'])
         self.assertEqual(mocked_post.call_args[1]['json']['label'], payload['label'])
