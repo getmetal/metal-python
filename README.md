@@ -12,7 +12,7 @@ $ pip install metal-sdk
 ## Usage
 
 ```python
-from metal_sdk.Metal import Metal
+from metal_sdk.metal import Metal
 
 
 metal = Metal("api_key", "client_id", "app_id");
