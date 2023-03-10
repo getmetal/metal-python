@@ -6,7 +6,7 @@
 ## Setup
 
 ```bash
-$ pip install metal-sdk
+$ pip3 install metal-sdk
 ```
 
 ## Usage
