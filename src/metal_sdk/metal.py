@@ -23,6 +23,9 @@ class Metal:
   
   def __getData(self, app, payload: dict = {}):
     data = { 'app': app }
+    if (payload.get('id') is not None):
+      data['id'] = payload['id']
+
     if (payload.get('imageBase64') is not None):
       data['imageBase64'] = payload['imageBase64']
     elif (payload.get('imageUrl') is not None):
