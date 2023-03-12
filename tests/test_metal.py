@@ -1,5 +1,5 @@
 from unittest import TestCase, mock
-from src.metal_sdk.Metal import Metal
+from src.metal_sdk.metal import Metal
 
 
 API_KEY = 'api-key'
@@ -39,7 +39,9 @@ class TestMetal(TestCase):
     @mock.patch('requests.post')
     def test_metal_index_with_text(self, mocked_post):
         my_app = 'my-app'
-        payload = { 'text': 'some text' }
+        mock_text = 'some text'
+        mock_id = 'some-id'
+        payload = { 'id': mock_id, 'text': mock_text }
 
         mocked_post.return_value = mock.Mock(status_code=201)
 
@@ -99,8 +101,8 @@ class TestMetal(TestCase):
 
     @mock.patch('requests.post')
     def test_metal_tune_with_payload(self, mocked_post):
+        app_id = 'app-id'
         payload = {
-            'app': 'app-id',
             'idA': 'id-a',
             'idB': 'id-b',
             'label': -1
@@ -110,7 +112,7 @@ class TestMetal(TestCase):
 
         self.assertEqual(mocked_post.call_count, 1)
         self.assertEqual(mocked_post.call_args[0][0], 'https://api.getmetal.io/v1/tune')
-        self.assertEqual(mocked_post.call_args[1]['json']['app'], payload['app-id'])
+        self.assertEqual(mocked_post.call_args[1]['json']['app'], app_id)
         self.assertEqual(mocked_post.call_args[1]['json']['idA'], payload['idA'])
         self.assertEqual(mocked_post.call_args[1]['json']['idB'], payload['idB'])
         self.assertEqual(mocked_post.call_args[1]['json']['label'], payload['label'])

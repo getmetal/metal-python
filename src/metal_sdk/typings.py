@@ -8,6 +8,7 @@ class TuneLabel(Enum):
     POSITIVE = 1
 
 class IndexPayload(TypedDict):
+    id: Optional[str]
     imageBase64: Optional[str]
     imageUrl: Optional[str]
     text: Optional[str]
