@@ -53,13 +53,18 @@ class Metal:
     r = requests.post(BASE_API + '/index', json=data, headers=headers)
     return r.json()
   
-  def search(self, payload: SearchPayload = {}, app_id = None):
+  def search(self, payload: SearchPayload = {}, app_id = None, includeFullDocument = False):
     headers = self.__get_headers()
     app = app_id or self.app_id
     self.__validateIndexAndSearch(app, payload)
     data = self.__getData(app, payload)
 
-    r =  requests.post(BASE_API + '/search', json=data, headers=headers)
+    url = BASE_API + "/search"
+
+    if includeFullDocument:
+      url = url + "?includeDoc=true"
+
+    r =  requests.post(url, json=data, headers=headers)
     return r.json()
   
   def tune(self, payload: TunePayload = {}, app_id = None):
