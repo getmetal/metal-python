@@ -7,18 +7,21 @@ class TuneLabel(Enum):
     NEUTRAL = 0
     POSITIVE = 1
 
+
 class IndexPayload(TypedDict):
     id: Optional[str]
     imageBase64: Optional[str]
     imageUrl: Optional[str]
     text: Optional[str]
     embedding: Optional[list[float]]
-    
+
+
 class SearchPayload(TypedDict):
     imageBase64: Optional[str]
     imageUrl: Optional[str]
     text: Optional[str]
     embedding: Optional[list[float]]
+
 
 class TunePayload(TypedDict):
     idA: Optional[str]
