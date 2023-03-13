@@ -20,7 +20,6 @@ class TestMetal(TestCase):
         self.assertEqual(headers["x-metal-api-key"], API_KEY)
         self.assertEqual(headers["x-metal-client-id"], CLIENT_ID)
 
-    # @mock.patch('requests.post', return_value=mock.Mock(status_code=200, json=mock.Mock(return_value={'error': 'App ID is required.'}))
     @mock.patch("requests.post")
     def test_metal_index_without_app(self, mocked_post):
         metal = Metal(API_KEY, CLIENT_ID)
