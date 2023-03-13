@@ -22,6 +22,12 @@ metal.index({ text: 'b' })
 metal.index({ text: 'c' })
 ```
 
+## Testing
+
+```bash
+$ python3 -m unittest tests/test_metal.py
+```
+
 ## Contributing
 
 ```bash
