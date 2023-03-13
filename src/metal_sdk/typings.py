@@ -9,11 +9,11 @@ class TuneLabel(Enum):
 
 
 class IndexPayload(TypedDict):
-    id: Optional[str]
-    imageBase64: Optional[str]
-    imageUrl: Optional[str]
-    text: Optional[str]
-    embedding: Optional[list[float]]
+    id: Optional[str] = None
+    imageBase64: Optional[str] = None
+    imageUrl: Optional[str] = None
+    text: Optional[str] = None
+    embedding: Optional[List[float]] = None
 
 
 class SearchPayload(TypedDict):
