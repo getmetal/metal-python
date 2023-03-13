@@ -28,7 +28,7 @@ metal.index({ text: 'c' })
 $ python3 -m unittest tests/test_metal.py
 ```
 
-## Contributing
+## Publishing
 
 ```bash
 $ python3 -m build
