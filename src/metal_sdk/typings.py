@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, List
 
 
 class TuneLabel(Enum):
@@ -7,18 +7,21 @@ class TuneLabel(Enum):
     NEUTRAL = 0
     POSITIVE = 1
 
+
 class IndexPayload(TypedDict):
-    id: Optional[str]
-    imageBase64: Optional[str]
-    imageUrl: Optional[str]
-    text: Optional[str]
-    embedding: Optional[list[float]]
-    
+    id: Optional[str] = None
+    imageBase64: Optional[str] = None
+    imageUrl: Optional[str] = None
+    text: Optional[str] = None
+    embedding: Optional[List[float]] = None
+
+
 class SearchPayload(TypedDict):
-    imageBase64: Optional[str]
-    imageUrl: Optional[str]
-    text: Optional[str]
-    embedding: Optional[list[float]]
+    imageBase64: Optional[str] = None
+    imageUrl: Optional[str] = None
+    text: Optional[str] = None
+    embedding: Optional[List[float]] = None
+
 
 class TunePayload(TypedDict):
     idA: Optional[str]
