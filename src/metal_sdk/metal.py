@@ -58,7 +58,7 @@ class Metal:
         return r.json()
 
     def search(
-        self, payload: SearchPayload = {}, app_id=None, includeFullDocument=False
+        self, payload: SearchPayload = {}, app_id=None, ids_only=False
     ):
         headers = self.__get_headers()
         app = app_id or self.app_id
@@ -67,8 +67,8 @@ class Metal:
 
         url = BASE_API + "/search"
 
-        if includeFullDocument:
-            url = url + "?includeDoc=true"
+        if ids_only:
+            url = url + "?idsOnly=true"
 
         r = requests.post(url, json=data, headers=headers)
         return r.json()

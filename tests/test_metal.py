@@ -83,12 +83,12 @@ class TestMetal(TestCase):
         mocked_post.return_value = mock.Mock(status_code=201)
 
         metal = Metal(API_KEY, CLIENT_ID, my_app)
-        metal.search(payload, includeFullDocument=True)
+        metal.search(payload, ids_only=True)
 
         self.assertEqual(mocked_post.call_count, 1)
         self.assertEqual(
             mocked_post.call_args[0][0],
-            "https://api.getmetal.io/v1/search?includeDoc=true",
+            "https://api.getmetal.io/v1/search?idsOnly=true",
         )
         self.assertEqual(mocked_post.call_args[1]["json"]["app"], my_app)
         self.assertEqual(mocked_post.call_args[1]["json"]["text"], payload["text"])
