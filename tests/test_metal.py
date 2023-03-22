@@ -1,5 +1,5 @@
 from unittest import TestCase, mock
-from src.metal_sdk.metal import Metal
+from src.metal.metal import Metal
 
 
 API_KEY = "api-key"
