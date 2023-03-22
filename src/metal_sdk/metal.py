@@ -1,25 +1,32 @@
-import requests
+import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload
 
 BASE_API = "https://api.getmetal.io/v1"
 
 
-class Metal:
+class Metal(httpx.AsyncClient):
     api_key: str
     client_id: str
     app_id: str
 
-    def __init__(self, api_key, client_id, app_id=None):
+    def __init__(self, api_key, client_id, app_id, base_url=BASE_API):
+        super().__init__()
         self.api_key = api_key
         self.client_id = client_id
         self.app_id = app_id
+        self.headers.update({
+            'Content-Type': 'application/json',
+            'x-metal-api-key': self.api_key,
+            'x-metal-client-id': self.client_id,
+        })
+        self.base_url = base_url
 
-    def __get_headers(self):
-        return {
-            "Content-Type": "application/json",
-            "x-metal-api-key": self.api_key,
-            "x-metal-client-id": self.client_id,
-        }
+    # def __get_headers(self):
+    #     return {
+    #         "Content-Type": "application/json",
+    #         "x-metal-api-key": self.api_key,
+    #         "x-metal-client-id": self.client_id,
+    #     }
 
     def __getData(self, app, payload: dict = {}):
         data = {"app": app}
@@ -49,6 +56,7 @@ class Metal:
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
+
     def index(self, payload: IndexPayload = {}, app_id=None):
         headers = self.__get_headers()
         app = self.app_id or app_id
@@ -56,6 +64,7 @@ class Metal:
         data = self.__getData(app, payload)
         r = requests.post(BASE_API + "/index", json=data, headers=headers)
         return r.json()
+
 
     def search(
         self, payload: SearchPayload = {}, app_id=None, ids_only=False
@@ -73,7 +82,25 @@ class Metal:
         r = requests.post(url, json=data, headers=headers)
         return r.json()
 
-    def tune(self, payload: TunePayload = {}, app_id=None):
+
+    async def tune(self, payload: TunePayload = {}, app_id = None):
+        app = app_id or self.app_id
+
+        if app is None:
+            raise TypeError("app_id required")
+
+        idA = payload.get("idA")
+        idB = payload.get("idB")
+        label = payload.get("label")
+        if idA is None or idB is None or label is None:
+            raise TypeError("idA, idB, and label required")
+
+        data = {"app": app, "idA": idA, "idB": idB, "label": label}
+        res = await self.post("/tune", json=data)
+        return res.json()
+
+
+    def tune2(self, payload: TunePayload = {}, app_id=None):
         headers = self.__get_headers()
         app = app_id or self.app_id
 
