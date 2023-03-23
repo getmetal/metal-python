@@ -2,6 +2,7 @@ import requests
 from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
 
+
 BASE_API = "https://api.getmetal.io/v1"
 
 
@@ -67,6 +68,7 @@ class Metal(requests.Session):
         url = "/index"
 
         res = self.request("post", url, json=data)
+        res.raise_for_status()
         return res.json()
 
     def search(
@@ -82,6 +84,7 @@ class Metal(requests.Session):
             url = url + "?idsOnly=true"
 
         res = self.request("post", url, json=data)
+        res.raise_for_status()
         return res.json()
 
     def tune(self, payload: TunePayload = {}, app_id = None):
@@ -101,4 +104,5 @@ class Metal(requests.Session):
         data = {"app": app, "idA": idA, "idB": idB, "label": label}
 
         res = self.request("post", url, json=data)
+        res.raise_for_status()
         return res.json()

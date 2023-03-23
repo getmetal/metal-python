@@ -81,7 +81,7 @@ class TestMetal(TestCase):
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
 
         metal.search(payload, ids_only=True)
-        print(metal.request.call_args)
+
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
             metal.request.call_args[0][0],
