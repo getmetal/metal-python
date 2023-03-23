@@ -1,4 +1,4 @@
-import requests
+import httpx
 from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
 
@@ -6,7 +6,7 @@ from .typings import IndexPayload, SearchPayload, TunePayload
 BASE_API = "https://api.getmetal.io"
 
 
-class Metal(requests.Session):
+class Metal(httpx.Client):
     api_key: str
     client_id: str
     app_id: str
