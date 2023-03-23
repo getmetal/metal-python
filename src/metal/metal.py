@@ -1,18 +1,30 @@
 import requests
+from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
+
 
 BASE_API = "https://api.getmetal.io/v1"
 
 
-class Metal:
+class Metal(requests.Session):
     api_key: str
     client_id: str
     app_id: str
 
-    def __init__(self, api_key, client_id, app_id=None):
+    def __init__(self, api_key, client_id, app_id=None, base_url=BASE_API):
+        super().__init__()
         self.api_key = api_key
         self.client_id = client_id
         self.app_id = app_id
+        self.headers.update({
+            'Content-Type': 'application/json',
+            'x-metal-api-key': self.api_key,
+            'x-metal-client-id': self.client_id,
+        })
+        self.base_url = base_url
+
+    def request(self, method, url, *args, **kwargs):
+        return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
 
     def __get_headers(self):
         return {
@@ -50,31 +62,32 @@ class Metal:
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
     def index(self, payload: IndexPayload = {}, app_id=None):
-        headers = self.__get_headers()
         app = self.app_id or app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
-        r = requests.post(BASE_API + "/index", json=data, headers=headers)
-        return r.json()
+        url = "/index"
+
+        res = self.request("post", url, json=data)
+        res.raise_for_status()
+        return res.json()
 
     def search(
         self, payload: SearchPayload = {}, app_id=None, ids_only=False
     ):
-        headers = self.__get_headers()
         app = app_id or self.app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
 
-        url = BASE_API + "/search"
+        url = "/search"
 
         if ids_only:
             url = url + "?idsOnly=true"
 
-        r = requests.post(url, json=data, headers=headers)
-        return r.json()
+        res = self.request("post", url, json=data)
+        res.raise_for_status()
+        return res.json()
 
     def tune(self, payload: TunePayload = {}, app_id=None):
-        headers = self.__get_headers()
         app = app_id or self.app_id
 
         if app is None:
@@ -83,10 +96,13 @@ class Metal:
         idA = payload.get("idA")
         idB = payload.get("idB")
         label = payload.get("label")
+
         if idA is None or idB is None or label is None:
             raise TypeError("idA, idB, and label required")
 
-        url = BASE_API + "/tune"
+        url = "/tune"
         data = {"app": app, "idA": idA, "idB": idB, "label": label}
-        r = requests.post(url, json=data, headers=headers)
-        return r.json()
+
+        res = self.request("post", url, json=data)
+        res.raise_for_status()
+        return res.json()
