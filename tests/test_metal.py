@@ -20,15 +20,13 @@ class TestMetal(TestCase):
         self.assertEqual(headers["x-metal-api-key"], API_KEY)
         self.assertEqual(headers["x-metal-client-id"], CLIENT_ID)
 
-    @mock.patch("requests.post")
-    def test_metal_index_without_app(self, mocked_post):
+    def test_metal_index_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
         with self.assertRaises(TypeError) as ctx:
             metal.index()
         self.assertEqual(str(ctx.exception), "app_id required")
 
-    @mock.patch("requests.post")
-    def test_metal_index_without_payload(self, mocked_post):
+    def test_metal_index_without_payload(self):
         my_app = "my-app"
         metal = Metal(API_KEY, CLIENT_ID, my_app)
 
@@ -38,34 +36,33 @@ class TestMetal(TestCase):
             str(ctx.exception), "imageBase64, imageUrl, text, or embedding required"
         )
 
-    @mock.patch("requests.post")
-    def test_metal_index_with_text(self, mocked_post):
+    def test_metal_index_with_text(self):
         my_app = "my-app"
         mock_text = "some text"
         mock_id = "some-id"
         payload = {"id": mock_id, "text": mock_text}
 
-        mocked_post.return_value = mock.Mock(status_code=201)
-
         metal = Metal(API_KEY, CLIENT_ID, my_app)
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
         metal.index(payload)
 
-        self.assertEqual(mocked_post.call_count, 1)
+        self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
-            mocked_post.call_args[0][0], "https://api.getmetal.io/v1/index"
+            metal.request.call_args[0][0], "post"
         )
-        self.assertEqual(mocked_post.call_args[1]["json"]["app"], my_app)
-        self.assertEqual(mocked_post.call_args[1]["json"]["text"], payload["text"])
+        self.assertEqual(
+            metal.request.call_args[0][1], "/index"
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
+        self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
 
-    @mock.patch("requests.post")
-    def test_metal_search_without_app(self, mocked_post):
+    def test_metal_search_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
         with self.assertRaises(TypeError) as ctx:
             metal.search()
         self.assertEqual(str(ctx.exception), "app_id required")
 
-    @mock.patch("requests.post")
-    def test_metal_search_without_payload(self, mocked_post):
+    def test_metal_search_without_payload(self):
         my_app = "my-app"
         metal = Metal(API_KEY, CLIENT_ID, my_app)
 
@@ -75,33 +72,35 @@ class TestMetal(TestCase):
             str(ctx.exception), "imageBase64, imageUrl, text, or embedding required"
         )
 
-    @mock.patch("requests.post")
-    def test_metal_search_with_text(self, mocked_post):
+    def test_metal_search_with_text(self):
         my_app = "my-app"
         payload = {"text": "some text"}
 
-        mocked_post.return_value = mock.Mock(status_code=201)
-
         metal = Metal(API_KEY, CLIENT_ID, my_app)
+
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
+
         metal.search(payload, ids_only=True)
-
-        self.assertEqual(mocked_post.call_count, 1)
+        print(metal.request.call_args)
+        self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
-            mocked_post.call_args[0][0],
-            "https://api.getmetal.io/v1/search?idsOnly=true",
+            metal.request.call_args[0][0],
+            "post",
         )
-        self.assertEqual(mocked_post.call_args[1]["json"]["app"], my_app)
-        self.assertEqual(mocked_post.call_args[1]["json"]["text"], payload["text"])
+        self.assertEqual(
+            metal.request.call_args[0][1],
+            "/search?idsOnly=true",
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
+        self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
 
-    @mock.patch("requests.post")
-    def test_metal_tune_without_app(self, mocked_post):
+    def test_metal_tune_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
         with self.assertRaises(TypeError) as ctx:
             metal.tune()
         self.assertEqual(str(ctx.exception), "app_id required")
 
-    @mock.patch("requests.post")
-    def test_metal_tune_witout_payload(self, mocked_post):
+    def test_metal_tune_witout_payload(self):
         app_id = "app-id"
         metal = Metal(API_KEY, CLIENT_ID, app_id)
         with self.assertRaises(TypeError) as ctx:

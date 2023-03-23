@@ -23,7 +23,6 @@ class Metal(requests.Session):
         self.base_url = base_url
 
     def request(self, method, url, *args, **kwargs):
-        print('method', method)
         return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
 
     def __get_headers(self):
@@ -62,28 +61,28 @@ class Metal(requests.Session):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
     def index(self, payload: IndexPayload = {}, app_id=None):
-        headers = self.__get_headers()
         app = self.app_id or app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
-        r = requests.post(BASE_API + "/index", json=data, headers=headers)
-        return r.json()
+        url = "/index"
+
+        res = self.request("post", url, json=data)
+        return res.json()
 
     def search(
         self, payload: SearchPayload = {}, app_id=None, ids_only=False
     ):
-        headers = self.__get_headers()
         app = app_id or self.app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
 
-        url = BASE_API + "/search"
+        url = "/search"
 
         if ids_only:
             url = url + "?idsOnly=true"
 
-        r = requests.post(url, json=data, headers=headers)
-        return r.json()
+        res = self.request("post", url, json=data)
+        return res.json()
 
     def tune(self, payload: TunePayload = {}, app_id = None):
         app = app_id or self.app_id
