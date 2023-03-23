@@ -1,5 +1,5 @@
 from unittest import TestCase, mock
-from src.metal.metal import Metal
+from src.metal_sdk.metal import Metal
 
 
 API_KEY = "api-key"
@@ -13,12 +13,6 @@ class TestMetal(TestCase):
         self.assertEqual(metal.api_key, API_KEY)
         self.assertEqual(metal.client_id, CLIENT_ID)
         self.assertEqual(metal.app_id, app_id)
-
-    def test_metal_get_headers(self):
-        metal = Metal(API_KEY, CLIENT_ID)
-        headers = metal._Metal__get_headers()
-        self.assertEqual(headers["x-metal-api-key"], API_KEY)
-        self.assertEqual(headers["x-metal-client-id"], CLIENT_ID)
 
     def test_metal_index_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
@@ -51,7 +45,7 @@ class TestMetal(TestCase):
             metal.request.call_args[0][0], "post"
         )
         self.assertEqual(
-            metal.request.call_args[0][1], "/index"
+            metal.request.call_args[0][1], "/v1/index"
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
@@ -89,7 +83,7 @@ class TestMetal(TestCase):
         )
         self.assertEqual(
             metal.request.call_args[0][1],
-            "/search?idsOnly=true",
+            "/v1/search?idsOnly=true",
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
@@ -117,7 +111,7 @@ class TestMetal(TestCase):
         metal.tune(payload)
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "post")
-        self.assertEqual(metal.request.call_args[0][1], "/tune")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/tune")
         self.assertEqual(metal.request.call_args[1]["json"]["app"], app_id)
         self.assertEqual(metal.request.call_args[1]["json"]["idA"], payload["idA"])
         self.assertEqual(metal.request.call_args[1]["json"]["idB"], payload["idB"])
