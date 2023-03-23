@@ -1,18 +1,30 @@
 import requests
+from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
 
 BASE_API = "https://api.getmetal.io/v1"
 
 
-class Metal:
+class Metal(requests.Session):
     api_key: str
     client_id: str
     app_id: str
 
-    def __init__(self, api_key, client_id, app_id=None):
+    def __init__(self, api_key, client_id, app_id=None, base_url=BASE_API):
+        super().__init__()
         self.api_key = api_key
         self.client_id = client_id
         self.app_id = app_id
+        self.headers.update({
+            'Content-Type': 'application/json',
+            'x-metal-api-key': self.api_key,
+            'x-metal-client-id': self.client_id,
+        })
+        self.base_url = base_url
+
+    def request(self, method, url, *args, **kwargs):
+        print('method', method)
+        return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
 
     def __get_headers(self):
         return {
@@ -73,8 +85,7 @@ class Metal:
         r = requests.post(url, json=data, headers=headers)
         return r.json()
 
-    def tune(self, payload: TunePayload = {}, app_id=None):
-        headers = self.__get_headers()
+    def tune(self, payload: TunePayload = {}, app_id = None):
         app = app_id or self.app_id
 
         if app is None:
@@ -83,10 +94,12 @@ class Metal:
         idA = payload.get("idA")
         idB = payload.get("idB")
         label = payload.get("label")
+
         if idA is None or idB is None or label is None:
             raise TypeError("idA, idB, and label required")
 
-        url = BASE_API + "/tune"
+        url = "/tune"
         data = {"app": app, "idA": idA, "idB": idB, "label": label}
-        r = requests.post(url, json=data, headers=headers)
-        return r.json()
+
+        res = self.request("post", url, json=data)
+        return res.json()

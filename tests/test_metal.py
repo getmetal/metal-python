@@ -108,16 +108,18 @@ class TestMetal(TestCase):
             metal.tune()
         self.assertEqual(str(ctx.exception), "idA, idB, and label required")
 
-    @mock.patch("requests.post")
-    def test_metal_tune_with_payload(self, mocked_post):
+    def test_metal_tune_with_payload(self):
         app_id = "app-id"
         payload = {"idA": "id-a", "idB": "id-b", "label": -1}
         metal = Metal(API_KEY, CLIENT_ID, app_id)
-        metal.tune(payload)
 
-        self.assertEqual(mocked_post.call_count, 1)
-        self.assertEqual(mocked_post.call_args[0][0], "https://api.getmetal.io/v1/tune")
-        self.assertEqual(mocked_post.call_args[1]["json"]["app"], app_id)
-        self.assertEqual(mocked_post.call_args[1]["json"]["idA"], payload["idA"])
-        self.assertEqual(mocked_post.call_args[1]["json"]["idB"], payload["idB"])
-        self.assertEqual(mocked_post.call_args[1]["json"]["label"], payload["label"])
+        metal.request = mock.MagicMock(return_value=mock.MagicMock(json=lambda: {"status": "success", "message": "Tune request processed"}))
+
+        metal.tune(payload)
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "/tune")
+        self.assertEqual(metal.request.call_args[1]["json"]["app"], app_id)
+        self.assertEqual(metal.request.call_args[1]["json"]["idA"], payload["idA"])
+        self.assertEqual(metal.request.call_args[1]["json"]["idB"], payload["idB"])
+        self.assertEqual(metal.request.call_args[1]["json"]["label"], payload["label"])
