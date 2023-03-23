@@ -111,8 +111,8 @@ class TestMetal(TestCase):
         app_id = "app-id"
         payload = {"idA": "id-a", "idB": "id-b", "label": -1}
         metal = Metal(API_KEY, CLIENT_ID, app_id)
-
-        metal.request = mock.MagicMock(return_value=mock.MagicMock(json=lambda: {"status": "success", "message": "Tune request processed"}))
+        return_value = mock.MagicMock(json=lambda: {"status": "success", "message": "ok"})
+        metal.request = mock.MagicMock(return_value=return_value)
 
         metal.tune(payload)
         self.assertEqual(metal.request.call_count, 1)

@@ -87,7 +87,7 @@ class Metal(requests.Session):
         res.raise_for_status()
         return res.json()
 
-    def tune(self, payload: TunePayload = {}, app_id = None):
+    def tune(self, payload: TunePayload = {}, app_id=None):
         app = app_id or self.app_id
 
         if app is None:
