@@ -65,16 +65,16 @@ class Metal(httpx.Client):
         return res.json()
 
     def search(
-        self, payload: SearchPayload = {}, app_id=None, ids_only=False
+        self, payload: SearchPayload = {}, app_id=None, ids_only=False, limit=1
     ):
         app = app_id or self.app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
 
-        url = "/v1/search"
+        url = "/v1/search?limit=" + str(limit)
 
         if ids_only:
-            url = url + "?idsOnly=true"
+            url = url + "&idsOnly=true"
 
         res = self.request("post", url, json=data)
         res.raise_for_status()

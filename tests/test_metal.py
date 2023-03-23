@@ -83,7 +83,7 @@ class TestMetal(TestCase):
         )
         self.assertEqual(
             metal.request.call_args[0][1],
-            "/v1/search?idsOnly=true",
+            "/v1/search?limit=1&idsOnly=true",
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])

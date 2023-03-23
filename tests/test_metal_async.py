@@ -74,7 +74,7 @@ class TestMetal(TestCase):
 
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
 
-        await metal.search(payload, ids_only=True)
+        await metal.search(payload, ids_only=True, limit=100)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
@@ -83,7 +83,7 @@ class TestMetal(TestCase):
         )
         self.assertEqual(
             metal.request.call_args[0][1],
-            "/v1/search?idsOnly=true",
+            "/v1/search?limit=100&idsOnly=true",
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
