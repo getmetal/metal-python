@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
 
 
-BASE_API = "https://api.getmetal.io/v1"
+BASE_API = "https://api.getmetal.io"
 
 
 class Metal(requests.Session):
@@ -25,13 +25,6 @@ class Metal(requests.Session):
 
     def request(self, method, url, *args, **kwargs):
         return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
-
-    def __get_headers(self):
-        return {
-            "Content-Type": "application/json",
-            "x-metal-api-key": self.api_key,
-            "x-metal-client-id": self.client_id,
-        }
 
     def __getData(self, app, payload: dict = {}):
         data = {"app": app}
@@ -65,7 +58,7 @@ class Metal(requests.Session):
         app = self.app_id or app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
-        url = "/index"
+        url = "/v1/index"
 
         res = self.request("post", url, json=data)
         res.raise_for_status()
@@ -78,7 +71,7 @@ class Metal(requests.Session):
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
 
-        url = "/search"
+        url = "/v1/search"
 
         if ids_only:
             url = url + "?idsOnly=true"
@@ -100,7 +93,7 @@ class Metal(requests.Session):
         if idA is None or idB is None or label is None:
             raise TypeError("idA, idB, and label required")
 
-        url = "/tune"
+        url = "/v1/tune"
         data = {"app": app, "idA": idA, "idB": idB, "label": label}
 
         res = self.request("post", url, json=data)

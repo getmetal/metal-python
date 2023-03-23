@@ -51,7 +51,7 @@ class TestMetal(TestCase):
             metal.request.call_args[0][0], "post"
         )
         self.assertEqual(
-            metal.request.call_args[0][1], "/index"
+            metal.request.call_args[0][1], "/v1/index"
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
@@ -89,7 +89,7 @@ class TestMetal(TestCase):
         )
         self.assertEqual(
             metal.request.call_args[0][1],
-            "/search?idsOnly=true",
+            "/v1/search?idsOnly=true",
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
@@ -117,7 +117,7 @@ class TestMetal(TestCase):
         metal.tune(payload)
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "post")
-        self.assertEqual(metal.request.call_args[0][1], "/tune")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/tune")
         self.assertEqual(metal.request.call_args[1]["json"]["app"], app_id)
         self.assertEqual(metal.request.call_args[1]["json"]["idA"], payload["idA"])
         self.assertEqual(metal.request.call_args[1]["json"]["idB"], payload["idB"])
