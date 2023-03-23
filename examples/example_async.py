@@ -19,5 +19,3 @@ async def main():
     result = await metal.search({"text": "Black Sabbath", "limit": 1})
 
     print(result)
-
-main()
