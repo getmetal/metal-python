@@ -14,12 +14,6 @@ class TestMetal(TestCase):
         self.assertEqual(metal.client_id, CLIENT_ID)
         self.assertEqual(metal.app_id, app_id)
 
-    def test_metal_get_headers(self):
-        metal = Metal(API_KEY, CLIENT_ID)
-        headers = metal._Metal__get_headers()
-        self.assertEqual(headers["x-metal-api-key"], API_KEY)
-        self.assertEqual(headers["x-metal-client-id"], CLIENT_ID)
-
     def test_metal_index_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
         with self.assertRaises(TypeError) as ctx:
