@@ -12,7 +12,7 @@ description = "SDK for getmetal.io"
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
-    "requests",
+    "httpx",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

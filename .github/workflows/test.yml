@@ -21,7 +21,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade build
           python -m build
-          pip install requests
+          pip install httpx
       - name: Test with unittest
         run: |
           python -m unittest discover -s ./tests  -p 'test_*.py'
