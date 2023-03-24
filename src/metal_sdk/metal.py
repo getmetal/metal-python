@@ -1,5 +1,4 @@
 import httpx
-from urllib.parse import urljoin
 from .typings import IndexPayload, SearchPayload, TunePayload
 
 
@@ -24,7 +23,7 @@ class Metal(httpx.Client):
         self.base_url = base_url
 
     def request(self, method, url, *args, **kwargs):
-        return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
+        return super().request(method, url, *args, **kwargs)
 
     def __getData(self, app, payload: dict = {}):
         data = {"app": app}
