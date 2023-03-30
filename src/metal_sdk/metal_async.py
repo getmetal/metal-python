@@ -98,3 +98,18 @@ class Metal(httpx.AsyncClient):
         res = await self.request("post", url, json=data)
         res.raise_for_status()
         return res.json()
+
+    async def get_one(self, id: str, app_id=None):
+        app = app_id or self.app_id
+
+        if app is None:
+            raise TypeError("app_id required")
+
+        if id is None:
+            raise TypeError("id required")
+
+        url = "/v1/documents/" + id
+
+        res = await self.request("get", url)
+        res.raise_for_status()
+        return res.json()
