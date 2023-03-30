@@ -117,13 +117,6 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["idB"], payload["idB"])
         self.assertEqual(metal.request.call_args[1]["json"]["label"], payload["label"])
 
-    async def test_metal_get_one_witout_payload(self):
-        app_id = "app-id"
-        metal = Metal(API_KEY, CLIENT_ID, app_id)
-        with self.assertRaises(TypeError) as ctx:
-            await metal.get_one()
-        self.assertEqual(str(ctx.exception), "id required")
-
     async def test_metal_get_one_with_payload(self):
         app_id = "app-id"
         id = "dave"
@@ -135,4 +128,3 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/documents/dave")
-        self.assertEqual(metal.request.call_args[1]["json"]["app"], app_id)

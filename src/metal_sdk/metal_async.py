@@ -99,12 +99,7 @@ class Metal(httpx.AsyncClient):
         res.raise_for_status()
         return res.json()
 
-    async def get_one(self, id: str, app_id=None):
-        app = app_id or self.app_id
-
-        if app is None:
-            raise TypeError("app_id required")
-
+    async def get_one(self, id: str):
         if id is None:
             raise TypeError("id required")
 
