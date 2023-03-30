@@ -131,7 +131,7 @@ class TestMetal(TestCase):
         return_value = mock.MagicMock(json=lambda: {"band": "Megadeth"})
         metal.request = mock.MagicMock(return_value=return_value)
 
-        await metal.get_one(id")
+        await metal.get_one(id)
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/documents/dave")

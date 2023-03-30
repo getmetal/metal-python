@@ -99,7 +99,6 @@ class Metal(httpx.Client):
         res.raise_for_status()
         return res.json()
 
-
     def get_one(self, id: str, app_id=None):
         app = app_id or self.app_id
 
