@@ -108,3 +108,13 @@ class Metal(httpx.AsyncClient):
         res = await self.request("get", url)
         res.raise_for_status()
         return res.json()
+
+    async def delete_one(self, id: str):
+        if id is None:
+            raise TypeError("id required")
+
+        url = "/v1/documents/" + id
+
+        res = await self.request("delete", url)
+        res.raise_for_status()
+        return res.json()

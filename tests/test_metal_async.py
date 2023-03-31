@@ -128,3 +128,15 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/documents/dave")
+
+    async def test_metal_delete_one_with_payload(self):
+        app_id = "app-id"
+        id = "dave"
+        metal = Metal(API_KEY, CLIENT_ID, app_id)
+        return_value = mock.MagicMock(json=lambda: {"band": "Megadeth"})
+        metal.request = mock.MagicMock(return_value=return_value)
+
+        await metal.get_one(id)
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "delete")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/documents/dave")
