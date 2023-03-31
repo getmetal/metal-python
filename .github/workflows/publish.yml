@@ -1,7 +1,7 @@
-name: unittests
+name: publish
 
 on:
-  pull_request:
+  push:
     branches: [main]
 
 jobs:
@@ -18,7 +18,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install httpx
-      - name: Test with unittest
-        run: |
-          python -m unittest discover -s ./tests  -p 'test_*.py'
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade build twine
+          python -m build
+          python3 -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

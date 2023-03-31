@@ -5,7 +5,7 @@ from .typings import IndexPayload, SearchPayload, TunePayload
 BASE_API = "https://api.getmetal.io"
 
 
-class Metal(httpx.Client):
+class Metal(httpx.AsyncClient):
     api_key: str
     client_id: str
     app_id: str
@@ -22,8 +22,8 @@ class Metal(httpx.Client):
         })
         self.base_url = base_url
 
-    def request(self, method, url, *args, **kwargs):
-        return super().request(method, url, *args, **kwargs)
+    async def request(self, method, url, *args, **kwargs):
+        return await super().request(method, url, *args, **kwargs)
 
     def __getData(self, app, payload: dict = {}):
         data = {"app": app}
@@ -53,17 +53,17 @@ class Metal(httpx.Client):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    def index(self, payload: IndexPayload = {}, app_id=None):
+    async def index(self, payload: IndexPayload = {}, app_id=None):
         app = self.app_id or app_id
         self.__validateIndexAndSearch(app, payload)
         data = self.__getData(app, payload)
         url = "/v1/index"
 
-        res = self.request("post", url, json=data)
+        res = await self.request("post", url, json=data)
         res.raise_for_status()
         return res.json()
 
-    def search(
+    async def search(
         self, payload: SearchPayload = {}, app_id=None, ids_only=False, limit=1
     ):
         app = app_id or self.app_id
@@ -75,11 +75,11 @@ class Metal(httpx.Client):
         if ids_only:
             url = url + "&idsOnly=true"
 
-        res = self.request("post", url, json=data)
+        res = await self.request("post", url, json=data)
         res.raise_for_status()
         return res.json()
 
-    def tune(self, payload: TunePayload = {}, app_id=None):
+    async def tune(self, payload: TunePayload = {}, app_id=None):
         app = app_id or self.app_id
 
         if app is None:
@@ -95,6 +95,6 @@ class Metal(httpx.Client):
         url = "/v1/tune"
         data = {"app": app, "idA": idA, "idB": idB, "label": label}
 
-        res = self.request("post", url, json=data)
+        res = await self.request("post", url, json=data)
         res.raise_for_status()
         return res.json()
