@@ -19,6 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install httpx
+          pip install typing_extensions
       - name: Test with unittest
         run: |
           python -m unittest discover -s ./tests  -p 'test_*.py'
