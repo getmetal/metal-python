@@ -34,7 +34,8 @@ class TestMetal(TestCase):
         my_app = "my-app"
         mock_text = "some text"
         mock_id = "some-id"
-        payload = {"id": mock_id, "text": mock_text}
+        mock_metadata = {"some": "metadata"}
+        payload = {"id": mock_id, "text": mock_text, "metadata": mock_metadata}
 
         metal = Metal(API_KEY, CLIENT_ID, my_app)
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
@@ -49,6 +50,7 @@ class TestMetal(TestCase):
         )
         self.assertEqual(metal.request.call_args[1]["json"]["app"], my_app)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
+        self.assertEqual(metal.request.call_args[1]["json"]["metadata"], payload["metadata"])
 
     def test_metal_search_without_app(self):
         metal = Metal(API_KEY, CLIENT_ID)
