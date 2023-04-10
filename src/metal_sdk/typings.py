@@ -16,6 +16,7 @@ class IndexPayload(TypedDict):
     imageUrl: NotRequired[str]
     text: NotRequired[str]
     embedding: NotRequired[List[float]]
+    metadata: NotRequired[dict]
 
 
 class SearchPayload(TypedDict):

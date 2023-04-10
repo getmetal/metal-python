@@ -29,6 +29,9 @@ class Metal(httpx.Client):
         data = {"app": app}
         if payload.get("id") is not None:
             data["id"] = payload["id"]
+        
+        if payload.get("metadata") is not None:
+            data["metadata"] = payload["metadata"]
 
         if payload.get("imageBase64") is not None:
             data["imageBase64"] = payload["imageBase64"]
