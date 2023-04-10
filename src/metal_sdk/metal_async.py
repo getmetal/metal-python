@@ -29,7 +29,7 @@ class Metal(httpx.AsyncClient):
         data = {"app": app}
         if payload.get("id") is not None:
             data["id"] = payload["id"]
-        
+
         if payload.get("metadata") is not None:
             data["metadata"] = payload["metadata"]
 
