@@ -15,24 +15,19 @@ $ pip3 install metal-sdk
 from metal_sdk.metal import Metal
 
 
-metal = Metal("api_key", "client_id", "app_id");
+metal = Metal("api_key", "client_id", "index_id");
 
 metal.index({ text: 'a' })
 metal.index({ text: 'b' })
 metal.index({ text: 'c' })
 ```
 
+[Async example](./examples/example_async.py)
+
 ## Testing
 
 ```bash
 $ python3 -m unittest tests/test_metal.py
-```
-
-## Publishing
-
-```bash
-$ python3 -m build
-$ python3 -m twine upload dist/*
 ```
 
 [Reference](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
