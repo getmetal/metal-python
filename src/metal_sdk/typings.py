@@ -19,11 +19,17 @@ class IndexPayload(TypedDict):
     metadata: NotRequired[dict]
 
 
+class SearchFilter(TypedDict):
+    field: str
+    value: str | int | float
+
+
 class SearchPayload(TypedDict):
     imageBase64: NotRequired[str]
     imageUrl: NotRequired[str]
     text: NotRequired[str]
     embedding: NotRequired[List[float]]
+    filters: NotRequired[List[SearchFilter]]
 
 
 class TunePayload(TypedDict):
