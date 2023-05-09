@@ -144,17 +144,16 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[0][0], "delete")
         self.assertEqual(metal.request.call_args[0][1], "/v1/documents/dave")
 
-
     async def test_metal_delete_many_with_payload(self):
-           index_id = "index-id"
-           id = "ozzy"
-           metal = Metal(API_KEY, CLIENT_ID, index_id)
-           return_value = mock.MagicMock(json=lambda: {"ozzy": "black sabbath"})
-           metal.request = mock.MagicMock(return_value=return_value)
+        index_id = "index-id"
+        id = "ozzy"
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+        return_value = mock.MagicMock(json=lambda: {"ozzy": "black sabbath"})
+        metal.request = mock.MagicMock(return_value=return_value)
 
-           await metal.delete_many([id])
+        await metal.delete_many([id])
 
-           self.assertEqual(metal.request.call_count, 1)
-           self.assertEqual(metal.request.call_args[0][0], "delete")
-           self.assertEqual(metal.request.call_args[0][1], "/v1/documents/bulk")
-           self.assertEqual(metal.request.call_args[1]["json"]["ids"], [id])
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "delete")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/documents/bulk")
+        self.assertEqual(metal.request.call_args[1]["json"]["ids"], [id])

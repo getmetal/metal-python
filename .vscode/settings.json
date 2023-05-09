@@ -1,6 +1,1 @@
-{
-  "[python]": {
-    "editor.defaultFormatter": "mikoz.black-py"
-  },
-  "python.formatting.provider": "none"
-}
+{}
