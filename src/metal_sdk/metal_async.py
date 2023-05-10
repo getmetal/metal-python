@@ -1,3 +1,4 @@
+from typing import List
 import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload
 
@@ -122,5 +123,15 @@ class Metal(httpx.AsyncClient):
         url = "/v1/documents/" + id
 
         res = await self.request("delete", url)
+        res.raise_for_status()
+        return res.json()
+
+    async def delete_many(self, ids: List[str]):
+        if ids is None:
+            raise TypeError("ids required")
+
+        url = "/v1/documents/bulk"
+
+        res = await self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
         return res.json()

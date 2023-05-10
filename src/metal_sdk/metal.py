@@ -1,4 +1,5 @@
 import httpx
+from typing import List
 from .typings import IndexPayload, SearchPayload, TunePayload
 
 
@@ -122,5 +123,15 @@ class Metal(httpx.Client):
         url = "/v1/documents/" + id
 
         res = self.request("delete", url)
+        res.raise_for_status()
+        return res.json()
+
+    def delete_many(self, ids: List[str], index_id=None):
+        if ids is None:
+            raise TypeError("ids required")
+
+        url = "/v1/documents/bulk"
+
+        res = self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
         return res.json()

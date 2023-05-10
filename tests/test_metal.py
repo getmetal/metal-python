@@ -42,15 +42,13 @@ class TestMetal(TestCase):
         metal.index(payload)
 
         self.assertEqual(metal.request.call_count, 1)
-        self.assertEqual(
-            metal.request.call_args[0][0], "post"
-        )
-        self.assertEqual(
-            metal.request.call_args[0][1], "/v1/index"
-        )
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/index")
         self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
-        self.assertEqual(metal.request.call_args[1]["json"]["metadata"], payload["metadata"])
+        self.assertEqual(
+            metal.request.call_args[1]["json"]["metadata"], payload["metadata"]
+        )
 
     def test_metal_search_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)
@@ -70,7 +68,10 @@ class TestMetal(TestCase):
 
     def test_metal_search_with_text(self):
         my_index = "my-index"
-        payload = {"text": "some text", "filters": [{"field": "number_of_the_beast", "value": 666}]}
+        payload = {
+            "text": "some text",
+            "filters": [{"field": "number_of_the_beast", "value": 666}],
+        }
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
@@ -89,7 +90,9 @@ class TestMetal(TestCase):
         )
         self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
-        self.assertEqual(metal.request.call_args[1]["json"]["filters"], payload["filters"])
+        self.assertEqual(
+            metal.request.call_args[1]["json"]["filters"], payload["filters"]
+        )
 
     def test_metal_tune_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)
@@ -108,7 +111,9 @@ class TestMetal(TestCase):
         index_id = "index-id"
         payload = {"idA": "id-a", "idB": "id-b", "label": -1}
         metal = Metal(API_KEY, CLIENT_ID, index_id)
-        return_value = mock.MagicMock(json=lambda: {"status": "success", "message": "ok"})
+        return_value = mock.MagicMock(
+            json=lambda: {"status": "success", "message": "ok"}
+        )
         metal.request = mock.MagicMock(return_value=return_value)
 
         metal.tune(payload)
@@ -140,6 +145,21 @@ class TestMetal(TestCase):
         metal.request = mock.MagicMock(return_value=return_value)
 
         metal.delete_one(id)
+
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "delete")
         self.assertEqual(metal.request.call_args[0][1], "/v1/documents/ozzy")
+
+    def test_metal_delete_many_with_payload(self):
+        index_id = "index-id"
+        id = "ozzy"
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+        return_value = mock.MagicMock(json=lambda: {"ozzy": "black sabbath"})
+        metal.request = mock.MagicMock(return_value=return_value)
+
+        metal.delete_many([id])
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "delete")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/documents/bulk")
+        self.assertEqual(metal.request.call_args[1]["json"]["ids"], [id])
