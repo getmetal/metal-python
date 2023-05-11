@@ -1,6 +1,6 @@
 import httpx
 from typing import List
-from .typings import IndexPayload, SearchPayload, TunePayload
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
 
 
 BASE_API = "https://api.getmetal.io"
@@ -65,6 +65,14 @@ class Metal(httpx.Client):
         self.__validateIndexAndSearch(index, payload)
         data = self.__getData(index, payload)
         url = "/v1/index"
+
+        res = self.request("post", url, json=data)
+        res.raise_for_status()
+        return res.json()
+
+    def index_many(self, payload: List[BulkIndexItem]):
+        url = "/v1/index/bulk"
+        data = {"data": payload}
 
         res = self.request("post", url, json=data)
         res.raise_for_status()
