@@ -1,6 +1,6 @@
 from typing import List
 import httpx
-from .typings import IndexPayload, SearchPayload, TunePayload
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
 
 
 BASE_API = "https://api.getmetal.io"
@@ -67,6 +67,14 @@ class Metal(httpx.AsyncClient):
         url = "/v1/index"
 
         res = await self.request("post", url, json=data)
+        res.raise_for_status()
+        return res.json()
+
+    async def index_many(self, payload: List[BulkIndexItem]):
+        url = "/v1/index/bulk"
+        data = {"data": payload}
+        res = await self.request("post", url, json=data)
+
         res.raise_for_status()
         return res.json()
 

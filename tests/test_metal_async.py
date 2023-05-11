@@ -53,6 +53,27 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
         self.assertEqual(metal.request.call_args[1]["json"]["metadata"], payload["metadata"])
 
+    async def test_metal_index_with_text(self):
+        my_index = "my-index"
+        mock_text = "some text"
+        mock_id = "some-id"
+        mock_metadata = {"some": "metadata"}
+
+        payload = [{"id": mock_id, "text": mock_text, "metadata": mock_metadata, "index": mock_index}]
+
+        metal = Metal(API_KEY, CLIENT_ID, my_index)
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
+        await metal.index_many(payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(
+            metal.request.call_args[0][0], "post"
+        )
+        self.assertEqual(
+            metal.request.call_args[0][1], "/v1/index/bulk"
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["data"], payload)
+
     async def test_metal_search_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)
         with self.assertRaises(TypeError) as ctx:

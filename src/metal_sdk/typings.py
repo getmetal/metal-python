@@ -19,6 +19,20 @@ class IndexPayload(TypedDict):
     metadata: NotRequired[dict]
 
 
+class BulkIndexItem(TypedDict):
+    id: NotRequired[str]
+    index: str
+    imageBase64: NotRequired[str]
+    imageUrl: NotRequired[str]
+    text: NotRequired[str]
+    embedding: NotRequired[List[float]]
+    metadata: NotRequired[dict]
+
+
+class BulkIndexPayload(TypedDict):
+    data: List[BulkIndexItem]
+
+
 class SearchFilter(TypedDict):
     field: str
     value: str | int | float
