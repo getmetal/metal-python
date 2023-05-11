@@ -55,7 +55,7 @@ class TestMetal(TestCase):
         mock_text = "some text"
         mock_id = "some-id"
         mock_metadata = {"some": "metadata"}
-        payload = [{ "id": mock_id, "text": mock_text, "metadata": mock_metadata, "index": my_index}]
+        payload = [{"id": mock_id, "text": mock_text, "metadata": mock_metadata, "index": my_index}]
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
