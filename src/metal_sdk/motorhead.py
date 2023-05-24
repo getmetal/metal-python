@@ -17,24 +17,24 @@ class Motorhead:
             'x-metal-client-id': self.client_id,
         })
 
-    async def add_memory(self, sessionId, payload):
-        response = await self.client.post(f'{self.base_url}/sessions/{sessionId}/memory', json=payload)
+    def add_memory(self, sessionId, payload):
+        response = self.client.post(f'{self.base_url}/sessions/{sessionId}/memory', json=payload)
         response.raise_for_status()
 
         data = response.json()
         memory = data.get('data', data)
         return memory
 
-    async def get_memory(self, sessionId):
-        response = await self.client.get(f'{self.base_url}/sessions/{sessionId}/memory')
+    def get_memory(self, sessionId):
+        response = self.client.get(f'{self.base_url}/sessions/{sessionId}/memory')
         response.raise_for_status()
 
         data = response.json()
         memory = data.get('data', data)
         return memory
 
-    async def delete_memory(self, sessionId):
-        response = await self.client.delete(f'{self.base_url}/sessions/{sessionId}/memory')
+    def delete_memory(self, sessionId):
+        response = self.client.delete(f'{self.base_url}/sessions/{sessionId}/memory')
         response.raise_for_status()
 
         data = response.json()
