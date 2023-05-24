@@ -2,6 +2,7 @@ import httpx
 
 API_URL = 'https://api.getmetal.io/v1/motorhead'
 
+
 class Motorhead(httpx.AsyncClient):
     def __init__(self, api_key=None, client_id=None, base_url=API_URL):
         super().__init__()
