@@ -1,5 +1,5 @@
 import pytest
-from httpx import Response, Request
+from httpx import Response
 from unittest.mock import MagicMock
 from src.metal_sdk.motorhead import Motorhead
 
@@ -12,6 +12,7 @@ def test_initialization():
     with pytest.raises(ValueError):
         m = Motorhead()
 
+
 def test_add_memory():
     m = Motorhead(api_key='test_key', client_id='test_client')
 
@@ -21,7 +22,11 @@ def test_add_memory():
 
     memory = m.add_memory('test_session', {'key': 'value'})
     assert memory == 'mock_memory'
-    m.client.post.assert_called_once_with('https://api.getmetal.io/v1/motorhead/sessions/test_session/memory', json={'key': 'value'})
+    m.client.post.assert_called_once_with(
+      'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory',
+      json={'key': 'value'}
+    )
+
 
 def test_get_memory():
     m = Motorhead(api_key='test_key', client_id='test_client')
@@ -33,6 +38,7 @@ def test_get_memory():
     memory = m.get_memory('test_session')
     assert memory == 'mock_memory'
     m.client.get.assert_called_once_with('https://api.getmetal.io/v1/motorhead/sessions/test_session/memory')
+
 
 def test_delete_memory():
     m = Motorhead(api_key='test_key', client_id='test_client')
