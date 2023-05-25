@@ -3,6 +3,7 @@ from httpx import Response
 from unittest.mock import MagicMock
 from src.metal_sdk.motorhead import Motorhead
 
+
 class TestMotorhead(unittest.TestCase):
 
     def setUp(self):
@@ -34,7 +35,9 @@ class TestMotorhead(unittest.TestCase):
 
         memory = self.motorhead.get_memory('test_session')
         self.assertEqual(memory, 'mock_memory')
-        self.motorhead.client.get.assert_called_once_with('https://api.getmetal.io/v1/motorhead/sessions/test_session/memory')
+        self.motorhead.client.get.assert_called_once_with(
+          'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
+        )
 
     def test_delete_memory(self):
         mock_response = MagicMock(spec=Response)
@@ -43,4 +46,6 @@ class TestMotorhead(unittest.TestCase):
 
         memory = self.motorhead.delete_memory('test_session')
         self.assertEqual(memory, 'mock_memory')
-        self.motorhead.client.delete.assert_called_once_with('https://api.getmetal.io/v1/motorhead/sessions/test_session/memory')
+        self.motorhead.client.delete.assert_called_once_with(
+          'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
+        )
