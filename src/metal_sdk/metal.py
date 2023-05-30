@@ -119,7 +119,7 @@ class Metal(httpx.Client):
 
         if id is None:
             raise TypeError("id required")
-        
+
         if index is None:
             raise TypeError("index_id required")
 
