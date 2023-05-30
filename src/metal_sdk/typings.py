@@ -50,3 +50,9 @@ class TunePayload(TypedDict):
     idA: str
     idB: str
     label: TuneLabel
+
+
+class MotorheadPayload(TypedDict):
+    api_key: NotRequired[str]
+    client_id: NotRequired[str]
+    base_url: NotRequired[str]
