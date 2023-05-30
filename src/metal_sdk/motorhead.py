@@ -1,15 +1,16 @@
 import httpx
+from .typings import MotorheadPayload
 
 API_URL = 'https://api.getmetal.io/v1/motorhead'
 
 
 class Motorhead:
-    def __init__(self, api_key=None, client_id=None, base_url=API_URL):
-        self.api_key = api_key
-        self.client_id = client_id
-        self.base_url = base_url
+    def __init__(self, payload: MotorheadPayload = {}):
+        self.api_key = payload.get("api_key")
+        self.client_id = payload.get("client_id")
+        self.base_url = payload.get("base_url") or API_URL
 
-        if base_url == API_URL and not (api_key and client_id):
+        if self.base_url == API_URL and not (self.api_key and self.client_id):
             raise ValueError('api_key and client_id required for managed motorhead')
 
         self.client = httpx.Client(headers={

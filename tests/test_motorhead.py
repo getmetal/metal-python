@@ -7,7 +7,7 @@ from src.metal_sdk.motorhead import Motorhead
 class TestMotorhead(unittest.TestCase):
 
     def setUp(self):
-        self.motorhead = Motorhead(api_key='test_key', client_id='test_client')
+        self.motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
 
     def test_initialization(self):
         self.assertEqual(self.motorhead.api_key, 'test_key')
