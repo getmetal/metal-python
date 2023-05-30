@@ -115,20 +115,30 @@ class Metal(httpx.Client):
         return res.json()
 
     def get_one(self, id: str, index_id=None):
+        index = index_id or self.index_id
+
         if id is None:
             raise TypeError("id required")
+        
+        if index is None:
+            raise TypeError("index_id required")
 
-        url = "/v1/documents/" + id
+        url = "/v1/indexes/" + index + "/documents/" + id
 
         res = self.request("get", url)
         res.raise_for_status()
         return res.json()
 
     def delete_one(self, id: str, index_id=None):
+        index = index_id or self.index_id
+
         if id is None:
             raise TypeError("id required")
 
-        url = "/v1/documents/" + id
+        if index is None:
+            raise TypeError("index_id required")
+
+        url = "/v1/indexes/" + index + "/documents/" + id
 
         res = self.request("delete", url)
         res.raise_for_status()
