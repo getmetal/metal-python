@@ -8,7 +8,7 @@ class Motorhead:
     def __init__(self, payload: MotorheadPayload = {}):
         self.api_key = payload.get("api_key")
         self.client_id = payload.get("client_id")
-        self.base_url = payload.get("base_url")
+        self.base_url = payload.get("base_url") or API_URL
 
         if self.base_url == API_URL and not (self.api_key and self.client_id):
             raise ValueError('api_key and client_id required for managed motorhead')
