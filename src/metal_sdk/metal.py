@@ -204,4 +204,4 @@ class Metal(httpx.Client):
         resource = self.__create_resource(index_id, filename, file_type, file_size)
 
         # Upload the file to the returned url
-        self.__upload_file_to_url(resource['url'], file_path, file_type, file_size)
+        self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)

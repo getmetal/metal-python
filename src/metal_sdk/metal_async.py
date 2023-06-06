@@ -204,4 +204,4 @@ class Metal(httpx.AsyncClient):
         resource = await self.__create_resource(index_id, filename, file_type, file_size)
 
         # Upload the file to the returned url
-        await self.__upload_file_to_url(resource['url'], file_path, file_type, file_size)
+        await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)

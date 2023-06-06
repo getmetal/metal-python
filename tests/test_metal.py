@@ -187,7 +187,7 @@ class TestMetal(TestCase):
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        metal._Metal__create_resource = mock.MagicMock(return_value={'url': 'https://mockuploadurl.com'})
+        metal._Metal__create_resource = mock.MagicMock(return_value={'data': {'url': 'https://mockuploadurl.com'} })
         metal._Metal__upload_file_to_url = mock.MagicMock()
         os.path.getsize = mock.MagicMock(return_value=1000)
         os.path.basename = mock.MagicMock(return_value="mockfile.csv")
