@@ -205,5 +205,3 @@ class Metal(httpx.Client):
 
         # Upload the file to the returned url
         self.__upload_file_to_url(resource['url'], file_path, file_type, file_size)
-
-        print(f"Upload successful: {file_path}")

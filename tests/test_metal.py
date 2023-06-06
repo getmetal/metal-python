@@ -187,7 +187,6 @@ class TestMetal(TestCase):
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        # Mock the necessary methods
         metal._Metal__create_resource = mock.MagicMock(return_value={'url': 'https://mockuploadurl.com'})
         metal._Metal__upload_file_to_url = mock.MagicMock()
         os.path.getsize = mock.MagicMock(return_value=1000)
@@ -195,18 +194,15 @@ class TestMetal(TestCase):
 
         metal.upload_file(my_index, mock_file_path)
 
-        # Assert that __create_resource and __upload_file_to_url were called
         self.assertEqual(metal._Metal__create_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
 
-        # Check the arguments of __create_resource call
         create_args = metal._Metal__create_resource.call_args[0]
         self.assertEqual(create_args[0], my_index)
         self.assertEqual(create_args[1], "mockfile.csv")
         self.assertEqual(create_args[2], "text/csv")
         self.assertEqual(create_args[3], 1000)
 
-        # Check the arguments of __upload_file_to_url call
         upload_args = metal._Metal__upload_file_to_url.call_args[0]
         self.assertEqual(upload_args[0], 'https://mockuploadurl.com')
         self.assertEqual(upload_args[1], mock_file_path)
