@@ -1,3 +1,5 @@
+import os
+import mimetypes
 from typing import List
 import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
@@ -153,3 +155,53 @@ class Metal(httpx.AsyncClient):
         res = await self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
         return res.json()
+
+    def __sanitize_filename(self, filename):
+        """
+        Implement your filename sanitation method here.
+        """
+        sanitized_filename = filename.replace(' ', '_')  # Simplified example
+        return sanitized_filename
+
+    async def __create_resource(self, index_id, filename, file_type, file_size):
+        url = f'{self.base_url}/indexes/{index_id}/files'
+        payload = {
+            'fileName': self.__sanitize_filename(filename),
+            'fileType': file_type,
+        }
+        headers = {'content-length': str(file_size)}
+
+        res = await self.request("post", url, json=payload, headers=headers)
+        res.raise_for_status()  # Raise exception if the request failed
+
+        return res.json()
+
+    async def __upload_file_to_url(self, url, file_path, file_type, file_size):
+        with open(file_path, 'rb') as f:
+            headers = {
+                'content-type': file_type,
+                'content-length': str(file_size),
+            }
+            res = await self.request("put", url, data=f, headers=headers)
+
+        res.raise_for_status()  # Raise exception if the request failed
+        return res
+
+    async def upload_file(self, index_id, file_path):
+        file_size = os.path.getsize(file_path)
+        filename = os.path.basename(file_path)
+        file_type, _ = mimetypes.guess_type(file_path)
+
+        if file_type not in [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'text/csv',
+        ]:
+            raise ValueError("Invalid file type. Supported types are: pdf, docx, csv.")
+
+        # Create resource on the server
+        resource = await self.__create_resource(index_id, filename, file_type, file_size)
+
+        # Upload the file to the returned url
+        await self.__upload_file_to_url(resource['url'], file_path, file_type, file_size)
