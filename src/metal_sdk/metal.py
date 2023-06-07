@@ -84,6 +84,10 @@ class Metal(httpx.Client):
         self, payload: SearchPayload = {}, index_id=None, ids_only=False, limit=1
     ):
         index = index_id or self.index_id
+
+        if index is None:
+            raise TypeError("index_id required")
+
         data = self.__getData(index, payload)
 
         url = "/v1/search?limit=" + str(limit)
