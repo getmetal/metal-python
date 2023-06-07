@@ -50,7 +50,7 @@ class Metal(httpx.Client):
 
         return data
 
-    def __validateIndexAndSearch(self, index=None, payload={}):
+    def __validateIndex(self, index=None, payload={}):
         if index is None:
             raise TypeError("index_id required")
 
@@ -64,7 +64,7 @@ class Metal(httpx.Client):
 
     def index(self, payload: IndexPayload = {}, index_id=None):
         index = self.index_id or index_id
-        self.__validateIndexAndSearch(index, payload)
+        self.__validateIndex(index, payload)
         data = self.__getData(index, payload)
         url = "/v1/index"
 
@@ -84,7 +84,6 @@ class Metal(httpx.Client):
         self, payload: SearchPayload = {}, index_id=None, ids_only=False, limit=1
     ):
         index = index_id or self.index_id
-        self.__validateIndexAndSearch(index, payload)
         data = self.__getData(index, payload)
 
         url = "/v1/search?limit=" + str(limit)
