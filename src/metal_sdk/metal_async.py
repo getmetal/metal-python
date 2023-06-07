@@ -169,7 +169,7 @@ class Metal(httpx.AsyncClient):
             'fileName': self.__sanitize_filename(filename),
             'fileType': file_type,
         }
-        headers = {'content-length': str(file_size)}
+        headers = {'x-metal-file-size': str(file_size)}
 
         res = await self.request("post", url, json=payload, headers=headers)
         res.raise_for_status()  # Raise exception if the request failed
