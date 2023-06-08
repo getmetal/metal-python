@@ -52,9 +52,6 @@ class TestMotorhead(unittest.TestCase):
 
         memory = motorhead.get_memory('test_session')
         self.assertEqual(memory, 'mock_memory')
-        # motorhead.client.get.assert_called_once_with(
-        #   'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
-        # )
         self.assertEqual(motorhead.request.call_count, 1)
         self.assertEqual(
             motorhead.request.call_args[0][0],
