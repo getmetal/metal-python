@@ -1,4 +1,6 @@
 import os
+import respx
+from httpx import Response
 from unittest import TestCase, mock
 from src.metal_sdk.metal import Metal
 
@@ -14,6 +16,18 @@ class TestMetal(TestCase):
         self.assertEqual(metal.api_key, API_KEY)
         self.assertEqual(metal.client_id, CLIENT_ID)
         self.assertEqual(metal.index_id, index_id)
+
+    @respx.mock
+    def test_request(self):
+        url = 'https://api.getmetal.io/foo/bar'
+        method = 'GET'
+        respx.get(url).mock(return_value=Response(200))
+
+        index_id = "index-id"
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+
+        response = metal.request(method, "/foo/bar")
+        assert response.status_code == 200
 
     def test_metal_index_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)
@@ -77,10 +91,22 @@ class TestMetal(TestCase):
         my_index = "my-index"
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        with self.assertRaises(TypeError) as ctx:
-            metal.search()
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
+        metal.search({"filters": [{"field": "foo", "value": "bar"}]}, limit=666)
+
+        self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
-            str(ctx.exception), "imageBase64, imageUrl, text, or embedding required"
+            metal.request.call_args[0][0],
+            "post",
+        )
+        self.assertEqual(
+            metal.request.call_args[0][1],
+            "/v1/search?limit=666",
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
+        self.assertEqual(metal.request.call_args[1]["json"].get("text"), None)
+        self.assertEqual(
+            metal.request.call_args[1]["json"]["filters"], [{"field": "foo", "value": "bar"}]
         )
 
     def test_metal_search_with_text(self):
