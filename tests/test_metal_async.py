@@ -1,4 +1,6 @@
 import os
+import respx
+from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
 from src.metal_sdk.metal_async import Metal
 
@@ -14,6 +16,18 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.api_key, API_KEY)
         self.assertEqual(metal.client_id, CLIENT_ID)
         self.assertEqual(metal.index_id, index_id)
+
+    @respx.mock
+    async def test_request(self):
+        url = 'https://api.getmetal.io/foo/bar'
+        method = 'GET'
+        respx.get(url).mock(return_value=Response(200))
+
+        index_id = "index-id"
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+
+        response = await metal.request(method, "/foo/bar")
+        assert response.status_code == 200
 
     async def test_metal_index_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)

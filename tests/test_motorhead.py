@@ -18,9 +18,9 @@ class TestMotorhead(unittest.TestCase):
         respx.get(url).mock(return_value=Response(200))
 
         payload = {"api_key": "test_key", "client_id": "test_id", "base_url": "https://test_base_url"}
-        client = Motorhead(payload)
+        motorhead = Motorhead(payload)
 
-        response = client.request(method, "/test_endpoint")
+        response = motorhead.request(method, "/test_endpoint")
         assert response.status_code == 200
 
     def test_add_memory(self):

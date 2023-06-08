@@ -1,3 +1,5 @@
+import respx
+from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
 from src.metal_sdk.motorhead_async import Motorhead
 
@@ -14,6 +16,18 @@ class TestMotorheadAsync(IsolatedAsyncioTestCase):
 
         with self.assertRaises(ValueError):
             Motorhead()
+
+    @respx.mock
+    async def test_request(self):
+        url = 'https://test_base_url/test_endpoint'
+        method = 'GET'
+        respx.get(url).mock(return_value=Response(200))
+
+        payload = {"api_key": "test_key", "client_id": "test_id", "base_url": "https://test_base_url"}
+        motorhead = Motorhead(payload)
+
+        response = await motorhead.request(method, "/test_endpoint")
+        assert response.status_code == 200
 
     async def test_add_memory(self):
         m = Motorhead({"api_key": API_KEY, "client_id": CLIENT_ID})
