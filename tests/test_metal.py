@@ -78,7 +78,7 @@ class TestMetal(TestCase):
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
-        metal.search({ "filters": [{"field": "foo", "value": "bar"}]}, limit=666)
+        metal.search({"filters": [{"field": "foo", "value": "bar"}]}, limit=666)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(

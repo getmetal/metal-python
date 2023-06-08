@@ -1,7 +1,7 @@
 import unittest
 import respx
-from httpx import Response, Request
-from unittest.mock import MagicMock, patch
+from httpx import Response
+from unittest.mock import MagicMock
 from src.metal_sdk.motorhead import Motorhead
 
 
@@ -23,10 +23,8 @@ class TestMotorhead(unittest.TestCase):
         response = client.request(method, "/test_endpoint")
         assert response.status_code == 200
 
-
     def test_add_memory(self):
         motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
-
         mock_response = MagicMock(spec=Response)
         mock_response.json.return_value = {'data': 'mock_memory'}
         motorhead.request = MagicMock(return_value=mock_response)
