@@ -1,43 +1,53 @@
 import httpx
 from .typings import MotorheadPayload
 
-API_URL = 'https://api.getmetal.io/v1/motorhead'
+API_URL = 'https://api.getmetal.io/v1/motorhead/'
 
 
-class Motorhead:
+class Motorhead(httpx.Client):
     def __init__(self, payload: MotorheadPayload = {}):
+        super().__init__()
         self.api_key = payload.get("api_key")
         self.client_id = payload.get("client_id")
         self.base_url = payload.get("base_url") or API_URL
 
-        if self.base_url == API_URL and not (self.api_key and self.client_id):
+        has_api_key = self.api_key is not None
+        has_client_id = self.client_id is not None
+        has_key_and_id = has_api_key and has_client_id
+
+        if self.base_url == API_URL and not has_key_and_id:
             raise ValueError('api_key and client_id required for managed motorhead')
 
-        self.client = httpx.Client(headers={
+        self.headers.update({
             'Content-Type': 'application/json',
             'x-metal-api-key': self.api_key,
             'x-metal-client-id': self.client_id,
         })
 
-    def add_memory(self, sessionId, payload):
-        response = self.client.post(f'{self.base_url}/sessions/{sessionId}/memory', json=payload)
-        response.raise_for_status()
+    def request(self, method, url, *args, **kwargs):
+        return super().request(method, url, *args, **kwargs)
 
-        data = response.json()
+    def add_memory(self, sessionId, payload):
+        url = f'/sessions/{sessionId}/memory'
+        res = self.request("post", url, json=payload)
+        res.raise_for_status()
+
+        data = res.json()
         memory = data.get('data', data)
         return memory
 
     def get_memory(self, sessionId):
-        response = self.client.get(f'{self.base_url}/sessions/{sessionId}/memory')
-        response.raise_for_status()
-
-        data = response.json()
+        url = f'/sessions/{sessionId}/memory'
+        res = self.request("get", url)
+        res.raise_for_status()
+        data = res.json()
         memory = data.get('data', data)
         return memory
 
     def delete_memory(self, sessionId):
-        response = self.client.delete(f'{self.base_url}/sessions/{sessionId}/memory')
-        response.raise_for_status()
+        url = f'/sessions/{sessionId}/memory'
+        res = self.request("delete", url)
+        res.raise_for_status()
 
-        data = response.json()
+        data = res.json()
         return data.get('data', data)

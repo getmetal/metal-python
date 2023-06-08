@@ -1,51 +1,84 @@
 import unittest
-from httpx import Response
-from unittest.mock import MagicMock
+import respx
+from httpx import Response, Request
+from unittest.mock import MagicMock, patch
 from src.metal_sdk.motorhead import Motorhead
 
 
 class TestMotorhead(unittest.TestCase):
-
-    def setUp(self):
-        self.motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
-
     def test_initialization(self):
-        self.assertEqual(self.motorhead.api_key, 'test_key')
-        self.assertEqual(self.motorhead.client_id, 'test_client')
-
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as ctx:
             Motorhead()
+        self.assertEqual(str(ctx.exception), "api_key and client_id required for managed motorhead")
+
+    @respx.mock
+    def test_request(self):
+        url = 'https://test_base_url/test_endpoint'
+        method = 'GET'
+        respx.get(url).mock(return_value=Response(200))
+
+        payload = {"api_key": "test_key", "client_id": "test_id", "base_url": "https://test_base_url"}
+        client = Motorhead(payload)
+
+        response = client.request(method, "/test_endpoint")
+        assert response.status_code == 200
+
 
     def test_add_memory(self):
+        motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
+
         mock_response = MagicMock(spec=Response)
         mock_response.json.return_value = {'data': 'mock_memory'}
-        self.motorhead.client.post = MagicMock(return_value=mock_response)
+        motorhead.request = MagicMock(return_value=mock_response)
 
-        memory = self.motorhead.add_memory('test_session', {'key': 'value'})
+        memory = motorhead.add_memory('test_session', {'key': 'value'})
         self.assertEqual(memory, 'mock_memory')
-        self.motorhead.client.post.assert_called_once_with(
-          'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory',
-          json={'key': 'value'}
+        self.assertEqual(motorhead.request.call_count, 1)
+        self.assertEqual(
+            motorhead.request.call_args[0][0],
+            "post",
         )
+        self.assertEqual(
+            motorhead.request.call_args[0][1],
+            "/sessions/test_session/memory",
+        )
+        self.assertEqual(motorhead.request.call_args[1]["json"], {'key': 'value'})
 
     def test_get_memory(self):
+        motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
         mock_response = MagicMock(spec=Response)
         mock_response.json.return_value = {'data': 'mock_memory'}
-        self.motorhead.client.get = MagicMock(return_value=mock_response)
+        motorhead.request = MagicMock(return_value=mock_response)
 
-        memory = self.motorhead.get_memory('test_session')
+        memory = motorhead.get_memory('test_session')
         self.assertEqual(memory, 'mock_memory')
-        self.motorhead.client.get.assert_called_once_with(
-          'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
+        # motorhead.client.get.assert_called_once_with(
+        #   'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
+        # )
+        self.assertEqual(motorhead.request.call_count, 1)
+        self.assertEqual(
+            motorhead.request.call_args[0][0],
+            "get",
+        )
+        self.assertEqual(
+            motorhead.request.call_args[0][1],
+            "/sessions/test_session/memory",
         )
 
     def test_delete_memory(self):
+        motorhead = Motorhead({"api_key": "test_key", "client_id": "test_client"})
         mock_response = MagicMock(spec=Response)
         mock_response.json.return_value = {'data': 'mock_memory'}
-        self.motorhead.client.delete = MagicMock(return_value=mock_response)
+        motorhead.request = MagicMock(return_value=mock_response)
 
-        memory = self.motorhead.delete_memory('test_session')
+        memory = motorhead.delete_memory('test_session')
         self.assertEqual(memory, 'mock_memory')
-        self.motorhead.client.delete.assert_called_once_with(
-          'https://api.getmetal.io/v1/motorhead/sessions/test_session/memory'
+        self.assertEqual(motorhead.request.call_count, 1)
+        self.assertEqual(
+            motorhead.request.call_args[0][0],
+            "delete",
+        )
+        self.assertEqual(
+            motorhead.request.call_args[0][1],
+            "/sessions/test_session/memory",
         )

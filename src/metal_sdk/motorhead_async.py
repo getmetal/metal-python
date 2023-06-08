@@ -1,16 +1,21 @@
 import httpx
+from .typings import MotorheadPayload
 
-API_URL = 'https://api.getmetal.io/v1/motorhead'
+API_URL = 'https://api.getmetal.io/v1/motorhead/'
 
 
 class Motorhead(httpx.AsyncClient):
-    def __init__(self, api_key=None, client_id=None, base_url=API_URL):
+    def __init__(self, payload: MotorheadPayload = {}):
         super().__init__()
-        self.api_key = api_key
-        self.client_id = client_id
-        self.base_url = base_url
+        self.api_key = payload.get("api_key")
+        self.client_id = payload.get("client_id")
+        self.base_url = payload.get("base_url") or API_URL
 
-        if base_url == API_URL and not (api_key and client_id):
+        has_api_key = self.api_key is not None
+        has_client_id = self.client_id is not None
+        has_key_and_id = has_api_key and has_client_id
+
+        if self.base_url == API_URL and not has_key_and_id:
             raise ValueError('api_key and client_id required for managed motorhead')
 
         self.headers.update({
@@ -19,25 +24,29 @@ class Motorhead(httpx.AsyncClient):
             'x-metal-client-id': self.client_id,
         })
 
-    async def add_memory(self, sessionId, payload):
-        response = await self.post(f'{self.base_url}/sessions/{sessionId}/memory', json=payload)
-        response.raise_for_status()
+    async def request(self, method, url, *args, **kwargs):
+        return await super().request(method, url, *args, **kwargs)
 
-        data = response.json()
+    async def add_memory(self, sessionId, payload):
+        url = f'/sessions/{sessionId}/memory'
+        res = await self.request("post", url, json=payload)
+        res.raise_for_status()
+
+        data = res.json()
         memory = data.get('data', data)
         return memory
 
     async def get_memory(self, sessionId):
-        response = await self.get(f'{self.base_url}/sessions/{sessionId}/memory')
-        response.raise_for_status()
-
-        data = response.json()
+        url = f'/sessions/{sessionId}/memory'
+        res = await self.request("get", url)
+        res.raise_for_status()
+        data = res.json()
         memory = data.get('data', data)
         return memory
 
     async def delete_memory(self, sessionId):
-        response = await self.delete(f'{self.base_url}/sessions/{sessionId}/memory')
-        response.raise_for_status()
+        url = f'/sessions/{sessionId}/memory'
+        res = await self.request("delete", url)
+        res.raise_for_status()
 
-        data = response.json()
-        return data.get('data', data)
+        return

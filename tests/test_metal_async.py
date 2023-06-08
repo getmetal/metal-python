@@ -1,5 +1,5 @@
 import os
-from unittest import TestCase, mock
+from unittest import IsolatedAsyncioTestCase, mock
 from src.metal_sdk.metal_async import Metal
 
 
@@ -7,7 +7,7 @@ API_KEY = "api-key"
 CLIENT_ID = "client-id"
 
 
-class TestMetal(TestCase):
+class TestMetal(IsolatedAsyncioTestCase):
     def test_metal_instantiate(self):
         index_id = "index-id"
         metal = Metal(API_KEY, CLIENT_ID, index_id)
@@ -40,7 +40,11 @@ class TestMetal(TestCase):
         payload = {"id": mock_id, "text": mock_text, "metadata": mock_metadata}
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
-        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
         await metal.index(payload)
 
         self.assertEqual(metal.request.call_count, 1)
@@ -63,7 +67,11 @@ class TestMetal(TestCase):
         payload = [{"id": mock_id, "text": mock_text, "metadata": mock_metadata, "index": my_index}]
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
-        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
         await metal.index_many(payload)
 
         self.assertEqual(metal.request.call_count, 1)
@@ -84,12 +92,25 @@ class TestMetal(TestCase):
     async def test_metal_search_without_payload(self):
         my_index = "my-index"
         metal = Metal(API_KEY, CLIENT_ID, my_index)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
 
-        with self.assertRaises(TypeError) as ctx:
-            await metal.search()
+        metal.request = mock.AsyncMock(return_value=mock_response)
+
+        await metal.search()
+
+        self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
-            str(ctx.exception), "imageBase64, imageUrl, text, or embedding required"
+            metal.request.call_args[0][0],
+            "post",
         )
+        self.assertEqual(
+            metal.request.call_args[0][1],
+            "/v1/search?limit=1",
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
+        self.assertEqual(metal.request.call_args[1]["json"].get("text"), None)
 
     async def test_metal_search_with_text(self):
         my_index = "my-index"
@@ -97,7 +118,11 @@ class TestMetal(TestCase):
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=201))
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
 
         await metal.search(payload, ids_only=True, limit=100)
 
@@ -130,8 +155,11 @@ class TestMetal(TestCase):
         index_id = "index-id"
         payload = {"idA": "id-a", "idB": "id-b", "label": -1}
         metal = Metal(API_KEY, CLIENT_ID, index_id)
-        return_value = mock.MagicMock(json=lambda: {"status": "success", "message": "ok"})
-        metal.request = mock.MagicMock(return_value=return_value)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
 
         await metal.tune(payload)
         self.assertEqual(metal.request.call_count, 1)
@@ -146,8 +174,11 @@ class TestMetal(TestCase):
         index_id = "index-id"
         id = "dave"
         metal = Metal(API_KEY, CLIENT_ID, index_id)
-        return_value = mock.MagicMock(json=lambda: {"band": "Megadeth"})
-        metal.request = mock.MagicMock(return_value=return_value)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
 
         await metal.get_one(id)
         self.assertEqual(metal.request.call_count, 1)
@@ -158,10 +189,14 @@ class TestMetal(TestCase):
         index_id = "index-id"
         id = "dave"
         metal = Metal(API_KEY, CLIENT_ID, index_id)
-        return_value = mock.MagicMock(json=lambda: {"band": "Megadeth"})
-        metal.request = mock.MagicMock(return_value=return_value)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
 
-        await metal.get_one(id)
+        metal.request = mock.AsyncMock(return_value=mock_response)
+
+        await metal.delete_one(id)
+
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "delete")
         self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/dave")
@@ -170,8 +205,11 @@ class TestMetal(TestCase):
         index_id = "index-id"
         id = "ozzy"
         metal = Metal(API_KEY, CLIENT_ID, index_id)
-        return_value = mock.MagicMock(json=lambda: {"ozzy": "black sabbath"})
-        metal.request = mock.MagicMock(return_value=return_value)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
 
         await metal.delete_many([id])
 
@@ -186,8 +224,8 @@ class TestMetal(TestCase):
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        metal._Metal__create_resource = mock.MagicMock(return_value={'data': {'url': 'https://mockuploadurl.com'}})
-        metal._Metal__upload_file_to_url = mock.MagicMock()
+        metal._Metal__create_resource = mock.AsyncMock(return_value={'data': {'url': 'https://mockuploadurl.com'}})
+        metal._Metal__upload_file_to_url = mock.AsyncMock()
         os.path.getsize = mock.MagicMock(return_value=1000)
         os.path.basename = mock.MagicMock(return_value="mockfile.csv")
 

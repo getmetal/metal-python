@@ -77,10 +77,22 @@ class TestMetal(TestCase):
         my_index = "my-index"
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
-        with self.assertRaises(TypeError) as ctx:
-            metal.search()
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
+        metal.search({ "filters": [{"field": "foo", "value": "bar"}]}, limit=666)
+
+        self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
-            str(ctx.exception), "imageBase64, imageUrl, text, or embedding required"
+            metal.request.call_args[0][0],
+            "post",
+        )
+        self.assertEqual(
+            metal.request.call_args[0][1],
+            "/v1/search?limit=666",
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
+        self.assertEqual(metal.request.call_args[1]["json"].get("text"), None)
+        self.assertEqual(
+            metal.request.call_args[1]["json"]["filters"], [{"field": "foo", "value": "bar"}]
         )
 
     def test_metal_search_with_text(self):
