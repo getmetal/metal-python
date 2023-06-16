@@ -17,9 +17,9 @@ from metal_sdk.metal import Metal
 
 metal = Metal("api_key", "client_id", "index_id");
 
-metal.index({ text: 'a' })
-metal.index({ text: 'b' })
-metal.index({ text: 'c' })
+metal.index({ "text": "a" })
+metal.index({ "text": "b" })
+metal.index({ "text": "c" })
 ```
 
 [Async example](./examples/example_async.py)
