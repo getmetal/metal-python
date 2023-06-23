@@ -147,7 +147,7 @@ class Metal(httpx.AsyncClient):
 
         res = await self.request("delete", url)
         res.raise_for_status()
-        return res.json()
+        return None
 
     async def delete_many(self, ids: List[str]):
         if ids is None:
@@ -157,7 +157,7 @@ class Metal(httpx.AsyncClient):
 
         res = await self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
-        return res.json()
+        return None
 
     def __sanitize_filename(self, filename):
         """

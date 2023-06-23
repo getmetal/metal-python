@@ -147,7 +147,8 @@ class Metal(httpx.Client):
 
         res = self.request("delete", url)
         res.raise_for_status()
-        return res.json()
+
+        return None
 
     def delete_many(self, ids: List[str], index_id=None):
         if ids is None:
@@ -157,7 +158,8 @@ class Metal(httpx.Client):
 
         res = self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
-        return res.json()
+
+        return None
 
     def __sanitize_filename(self, filename):
         """
