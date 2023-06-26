@@ -149,11 +149,16 @@ class Metal(httpx.AsyncClient):
         res.raise_for_status()
         return None
 
-    async def delete_many(self, ids: List[str]):
+    async def delete_many(self, ids: List[str], index_id=None):
+        index = index_id or self.index_id
+
+        if index is None:
+            raise TypeError("index_id required")
+
         if ids is None:
             raise TypeError("ids required")
 
-        url = "/v1/documents/bulk"
+        url = "/v1/indexes/" + index + "/documents/bulk"
 
         res = await self.request("delete", url, json={"ids": ids})
         res.raise_for_status()
@@ -190,7 +195,12 @@ class Metal(httpx.AsyncClient):
         res.raise_for_status()  # Raise exception if the request failed
         return res
 
-    async def upload_file(self, index_id, file_path):
+    async def upload_file(self, file_path, index_id=None):
+        index = index_id or self.index_id
+
+        if index is None:
+            raise TypeError("index_id required")
+
         file_size = os.path.getsize(file_path)
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
@@ -204,7 +214,7 @@ class Metal(httpx.AsyncClient):
             raise ValueError("Invalid file type. Supported types are: pdf, docx, csv.")
 
         # Create resource on the server
-        resource = await self.__create_resource(index_id, filename, file_type, file_size)
+        resource = await self.__create_resource(index, filename, file_type, file_size)
 
         # Upload the file to the returned url
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
