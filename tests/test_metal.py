@@ -204,7 +204,7 @@ class TestMetal(TestCase):
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "delete")
-        self.assertEqual(metal.request.call_args[0][1], "/v1/documents/bulk")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/bulk")
         self.assertEqual(metal.request.call_args[1]["json"]["ids"], [id])
 
     def test_upload_file(self):
@@ -221,7 +221,7 @@ class TestMetal(TestCase):
         metal._Metal__create_resource = mock.MagicMock(return_value={'data': {'url': 'https://mockuploadurl.com'}})
         metal._Metal__upload_file_to_url = mock.MagicMock()
 
-        metal.upload_file(my_index, mock_file_path)
+        metal.upload_file(mock_file_path)
 
         self.assertEqual(metal._Metal__create_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
