@@ -92,7 +92,7 @@ class TestMetal(TestCase):
         metal = Metal(API_KEY, CLIENT_ID, my_index)
 
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
-        metal.search({"filters": [{"field": "foo", "value": "bar"}]}, limit=666)
+        metal.search({"filters": {"and": [{"field": "foo", "value": "bar", "operator": "eq"}]}}, limit=666)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(
@@ -106,14 +106,14 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
         self.assertEqual(metal.request.call_args[1]["json"].get("text"), None)
         self.assertEqual(
-            metal.request.call_args[1]["json"]["filters"], [{"field": "foo", "value": "bar"}]
+            metal.request.call_args[1]["json"]["filters"]["and"], [{"field": "foo", "value": "bar", "operator": "eq"}]
         )
 
     def test_metal_search_with_text(self):
         my_index = "my-index"
         payload = {
             "text": "some text",
-            "filters": [{"field": "number_of_the_beast", "value": 666}],
+            "filters": {"and": [{"field": "number_of_the_beast", "value": 666, "operator": "lt"}]},
         }
 
         metal = Metal(API_KEY, CLIENT_ID, my_index)
@@ -134,7 +134,7 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
         self.assertEqual(
-            metal.request.call_args[1]["json"]["filters"], payload["filters"]
+            metal.request.call_args[1]["json"]["filters"]["and"], payload["filters"]
         )
 
     def test_metal_tune_without_index(self):
