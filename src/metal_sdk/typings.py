@@ -33,15 +33,13 @@ class BulkIndexPayload(TypedDict):
     data: List[BulkIndexItem]
 
 
-class SearchFilter(TypedDict):
-    and: NotRequired[List[SearchClause]]
-    or: NotRequired[List[SearchClause]]
-
-
 class SearchClause(TypedDict):
     field: str
     value: str | int | float
     operator: str
+
+
+SearchFilter = TypedDict('SearchFilter', {'and': List[SearchClause], 'or': List[SearchClause]})
 
 
 class SearchPayload(TypedDict):
