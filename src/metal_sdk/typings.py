@@ -33,9 +33,13 @@ class BulkIndexPayload(TypedDict):
     data: List[BulkIndexItem]
 
 
-class SearchFilter(TypedDict):
+class SearchClause(TypedDict):
     field: str
     value: str | int | float
+    operator: str
+
+
+SearchFilter = TypedDict('SearchFilter', {'and': List[SearchClause], 'or': List[SearchClause]})
 
 
 class SearchPayload(TypedDict):
@@ -43,7 +47,7 @@ class SearchPayload(TypedDict):
     imageUrl: NotRequired[str]
     text: NotRequired[str]
     embedding: NotRequired[List[float]]
-    filters: NotRequired[List[SearchFilter]]
+    filters: NotRequired[SearchFilter]
 
 
 class TunePayload(TypedDict):
