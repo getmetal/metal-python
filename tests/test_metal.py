@@ -134,7 +134,7 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["index"], my_index)
         self.assertEqual(metal.request.call_args[1]["json"]["text"], payload["text"])
         self.assertEqual(
-            metal.request.call_args[1]["json"]["filters"]["and"], payload["filters"]
+            metal.request.call_args[1]["json"]["filters"], payload["filters"]
         )
 
     def test_metal_tune_without_index(self):
