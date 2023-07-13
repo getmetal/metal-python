@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metal_sdk"
-version = "2.0.0"
+version = "2.0.1"
 authors = [
   { name="Metal Technologies Inc", email="james@getmetal.io" },
 ]

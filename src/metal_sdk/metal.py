@@ -174,7 +174,7 @@ class Metal(httpx.Client):
         return sanitized_filename
 
     def __create_resource(self, index_id, filename, file_type, file_size):
-        url = f'{self.base_url}/indexes/{index_id}/files'
+        url = f'{self.base_url}/v1/indexes/{index_id}/files'
         payload = {
             'fileName': self.__sanitize_filename(filename),
             'fileType': file_type,
