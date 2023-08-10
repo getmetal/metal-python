@@ -64,9 +64,9 @@ class Metal(httpx.Client):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    def fetch(self, method, url, payload):
+    def fetch(self, method, url, data):
         try:
-            res = self.request(method, url)
+            res = self.request(method, url, json=data)
             res.raise_for_status()
             return res
         except httpx.HTTPStatusError as e:
@@ -86,23 +86,14 @@ class Metal(httpx.Client):
         self.__validateIndex(index, payload)
         data = self.__getData(index, payload)
         url = "/v1/index"
-        res = self.fetch("index", url)
+        res = self.fetch("post", url, data)
         return res
 
     def index_many(self, payload: List[BulkIndexItem]):
         url = "/v1/index/bulk"
         data = {"data": payload}
-        try:
-            res = self.request("post", url, json=data)
-            res.raise_for_status()
-            return res.json()
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
-            logger.exception(formatted_error)
-            return response_data
+        res = self.fetch("post", url, data)
+        return res
 
     def search(
         self, payload: SearchPayload = {}, index_id=None, ids_only=False, limit=1
@@ -119,17 +110,8 @@ class Metal(httpx.Client):
         if ids_only:
             url = url + "&idsOnly=true"
 
-        try:
-            res = self.request("post", url, json=data)
-            res.raise_for_status()
-            return res.json()
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
-            logger.exception(formatted_error)
-            return response_data
+        res = self.fetch("post", url, data)
+        return res
 
     def tune(self, payload: TunePayload = {}, index_id=None):
         index = index_id or self.index_id
@@ -147,18 +129,8 @@ class Metal(httpx.Client):
         url = "/v1/tune"
         data = {"index": index, "idA": idA, "idB": idB, "label": label}
 
-        try:
-            res = self.request("post", url, json=data)
-            res.raise_for_status()
-            return res.json()
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*50}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
-            logger.exception(formatted_error)
-            return response_data
-
+        res = self.fetch("post", url, data)
+        return res
 
     def get_one(self, id: str, index_id=None):
         index = index_id or self.index_id
@@ -171,18 +143,8 @@ class Metal(httpx.Client):
 
         url = "/v1/indexes/" + index + "/documents/" + id
 
-        try:
-            res = self.request("get", url)
-            res.raise_for_status()
-            return res.json()
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*50}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
-            logger.exception(formatted_error)
-            return response_data
-
+        res = self.fetch("get", url, None)
+        return res
 
     def delete_one(self, id: str, index_id=None):
         index = index_id or self.index_id
@@ -195,17 +157,8 @@ class Metal(httpx.Client):
 
         url = "/v1/indexes/" + index + "/documents/" + id
 
-        try:
-                res = self.request("delete", url)
-                res.raise_for_status()
-                return None
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*50}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
-            logger.exception(formatted_error)
-            return response_data
+        res = self.fetch("delete", url, None)
+        return res
 
     def delete_many(self, ids: List[str], index_id=None):
         index = index_id or self.index_id
@@ -217,18 +170,9 @@ class Metal(httpx.Client):
             raise TypeError("ids required")
 
         url = f'/v1/indexes/{index}/documents/bulk'
-
-        try:
-            res = self.request("delete", url, json={"ids": ids})
-            res.raise_for_status()
-            return None
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*50}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
-            logger.exception(formatted_error)
-            return response_data
+        data = {"ids": ids}
+        res = self.fetch("delete", url, data)
+        return res
 
     def __sanitize_filename(self, filename):
         """
