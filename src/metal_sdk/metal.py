@@ -77,7 +77,7 @@ class Metal(httpx.Client):
             top_level_message = response_data.get('message')
             default_message = f"HTTP {status_code} error"
             error_message = nested_message or top_level_message or default_message
-            formatted_error = f"\n{'-'*60}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
+            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
             logger.exception(formatted_error)
             return response_data
 
