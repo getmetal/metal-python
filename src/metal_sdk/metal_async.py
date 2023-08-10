@@ -3,9 +3,10 @@ import mimetypes
 from typing import List
 import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
-
+import logging
 
 BASE_API = "https://api.getmetal.io"
+logger = logging.getLogger(__name__)
 
 
 class Metal(httpx.AsyncClient):
@@ -62,23 +63,37 @@ class Metal(httpx.AsyncClient):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
+    async def fetch(self, method, url, data):
+        try:
+            res = await self.request(method, url, json=data)
+            res.raise_for_status()
+            return res
+        except httpx.HTTPStatusError as e:
+            response_data = e.response.json()
+            status_code = e.response.status_code
+            error_detail = response_data.get('error', {})
+            nested_message = error_detail.get('message')
+            top_level_message = response_data.get('message')
+            default_message = f"HTTP {status_code} error"
+            error_message = nested_message or top_level_message or default_message
+            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
+            logger.exception(formatted_error)
+            return response_data
+
     async def index(self, payload: IndexPayload = {}, index_id=None):
         index = self.index_id or index_id
         self.__validateIndex(index, payload)
         data = self.__getData(index, payload)
         url = "/v1/index"
 
-        res = await self.request("post", url, json=data)
-        res.raise_for_status()
-        return res.json()
+        res = await self.fetch("post", url, data)
+        return res
 
     async def index_many(self, payload: List[BulkIndexItem]):
         url = "/v1/index/bulk"
         data = {"data": payload}
-        res = await self.request("post", url, json=data)
-
-        res.raise_for_status()
-        return res.json()
+        res = await self.fetch("post", url, data)
+        return res
 
     async def search(
         self, payload: SearchPayload = {}, index_id=None, ids_only=False, limit=1
@@ -95,9 +110,8 @@ class Metal(httpx.AsyncClient):
         if ids_only:
             url = url + "&idsOnly=true"
 
-        res = await self.request("post", url, json=data)
-        res.raise_for_status()
-        return res.json()
+        res = await self.fetch("post", url, data)
+        return res
 
     async def tune(self, payload: TunePayload = {}, index_id=None):
         index = index_id or self.index_id
@@ -115,9 +129,8 @@ class Metal(httpx.AsyncClient):
         url = "/v1/tune"
         data = {"index": index, "idA": idA, "idB": idB, "label": label}
 
-        res = await self.request("post", url, json=data)
-        res.raise_for_status()
-        return res.json()
+        res = await self.fetch("post", url, data)
+        return res
 
     async def get_one(self, id: str, index_id=None):
         index = index_id or self.index_id
@@ -130,9 +143,8 @@ class Metal(httpx.AsyncClient):
 
         url = "/v1/indexes/" + index + "/documents/" + id
 
-        res = await self.request("get", url)
-        res.raise_for_status()
-        return res.json()
+        res = await self.fetch("get", url, None)
+        return res
 
     async def delete_one(self, id: str, index_id=None):
         index = index_id or self.index_id
@@ -145,9 +157,8 @@ class Metal(httpx.AsyncClient):
 
         url = "/v1/indexes/" + index + "/documents/" + id
 
-        res = await self.request("delete", url)
-        res.raise_for_status()
-        return None
+        res = await self.fetch("delete", url, None)
+        return res
 
     async def delete_many(self, ids: List[str], index_id=None):
         index = index_id or self.index_id
@@ -159,10 +170,9 @@ class Metal(httpx.AsyncClient):
             raise TypeError("ids required")
 
         url = "/v1/indexes/" + index + "/documents/bulk"
-
-        res = await self.request("delete", url, json={"ids": ids})
-        res.raise_for_status()
-        return None
+        data = {"ids": ids}
+        res = await self.fetch("delete", url, data)
+        return res
 
     def __sanitize_filename(self, filename):
         """
