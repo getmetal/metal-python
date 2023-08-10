@@ -69,6 +69,7 @@ class Metal(httpx.Client):
         url = "/v1/index"
 
         res = self.request("post", url, json=data)
+
         res.raise_for_status()
         return res.json()
 
