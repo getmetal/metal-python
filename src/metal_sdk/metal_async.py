@@ -171,7 +171,7 @@ class Metal(httpx.AsyncClient):
 
         url = "/v1/indexes/" + index + "/documents/bulk"
         data = {"ids": ids}
-        res = self.fetch("delete", url, data)
+        res = await self.fetch("delete", url, data)
         return res
 
     def __sanitize_filename(self, filename):
