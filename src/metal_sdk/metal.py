@@ -64,22 +64,30 @@ class Metal(httpx.Client):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
+    def fetch(self, method, url, payload):
+        try:
+            res = self.request(method, url)
+            res.raise_for_status()
+            return res
+        except httpx.HTTPStatusError as e:
+            response_data = e.response.json()
+            status_code = e.response.status_code
+            error_detail = response_data.get('error', {})
+            nested_message = error_detail.get('message')
+            top_level_message = response_data.get('message')
+            default_message = f"HTTP {status_code} error"
+            error_message = nested_message or top_level_message or default_message
+            formatted_error = f"\n{'-'*60}\nError occurred while accessing {url}: {error_message}\n{'-'*50}\n"
+            logger.exception(formatted_error)
+            return response_data
+
     def index(self, payload: IndexPayload = {}, index_id=None):
         index = self.index_id or index_id
         self.__validateIndex(index, payload)
         data = self.__getData(index, payload)
         url = "/v1/index"
-        try:
-            res = self.request("post", url, json=data)
-            res.raise_for_status()
-            return res.json()
-        except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
-            status_code = e.response.status_code
-            error_message = response_data.get('error', {}).get('message') or response_data.get('message', f"HTTP {status_code} error")
-            formatted_error = f"\n{'-'*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
-            logger.exception(formatted_error)
-            return response_data
+        res = self.fetch("index", url)
+        return res
 
     def index_many(self, payload: List[BulkIndexItem]):
         url = "/v1/index/bulk"
