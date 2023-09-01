@@ -221,7 +221,9 @@ class TestMetal(TestCase):
         metal._Metal__create_resource = mock.MagicMock(return_value={'data': {'url': 'https://mockuploadurl.com'}})
         metal._Metal__upload_file_to_url = mock.MagicMock()
 
-        metal.upload_file(mock_file_path)
+        res = metal.upload_file(mock_file_path)
+
+        self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
 
         self.assertEqual(metal._Metal__create_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)

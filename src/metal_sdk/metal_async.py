@@ -67,7 +67,7 @@ class Metal(httpx.AsyncClient):
         try:
             res = await self.request(method, url, json=data)
             res.raise_for_status()
-            return res
+            return res.json()
         except httpx.HTTPStatusError as e:
             response_data = e.response.json()
             status_code = e.response.status_code
@@ -228,3 +228,4 @@ class Metal(httpx.AsyncClient):
 
         # Upload the file to the returned url
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
+        return resource
