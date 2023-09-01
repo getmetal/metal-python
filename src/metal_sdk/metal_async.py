@@ -228,3 +228,5 @@ class Metal(httpx.AsyncClient):
 
         # Upload the file to the returned url
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
+        return resource
+    
