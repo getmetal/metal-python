@@ -243,7 +243,9 @@ class TestMetal(IsolatedAsyncioTestCase):
         os.path.getsize = mock.MagicMock(return_value=1000)
         os.path.basename = mock.MagicMock(return_value="mockfile.csv")
 
-        await metal.upload_file(mock_file_path)
+        res = await metal.upload_file(mock_file_path)
+
+        self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
 
         self.assertEqual(metal._Metal__create_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
