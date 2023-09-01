@@ -91,6 +91,11 @@ class Metal(httpx.Client):
 
     def index_many(self, payload: List[BulkIndexItem]):
         url = "/v1/index/bulk"
+
+        for item in payload:
+            if item.get("index") is None:
+                item["index"] = self.index_id
+
         data = {"data": payload}
         res = self.fetch("post", url, data)
         return res

@@ -96,6 +96,32 @@ class TestMetal(IsolatedAsyncioTestCase):
             metal.request.call_args[0][1], "/v1/index/bulk"
         )
         self.assertEqual(metal.request.call_args[1]["json"]["data"], payload)
+    
+    async def test_metal_index_many_with_indexid(self):
+        my_index = "my-index"
+        mock_text = "some text"
+        mock_id = "some-id"
+        mock_metadata = {"some": "metadata"}
+
+        payload = [{"id": mock_id, "text": mock_text, "metadata": mock_metadata}]
+        payload_with_index = [{"id": mock_id, "text": mock_text, "metadata": mock_metadata, "index": my_index}]
+
+        metal = Metal(API_KEY, CLIENT_ID, my_index)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
+        await metal.index_many(payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(
+            metal.request.call_args[0][0], "post"
+        )
+        self.assertEqual(
+            metal.request.call_args[0][1], "/v1/index/bulk"
+        )
+        self.assertEqual(metal.request.call_args[1]["json"]["data"], payload_with_index)
 
     async def test_metal_search_without_index(self):
         metal = Metal(API_KEY, CLIENT_ID)
