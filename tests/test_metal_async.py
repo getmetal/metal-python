@@ -96,7 +96,7 @@ class TestMetal(IsolatedAsyncioTestCase):
             metal.request.call_args[0][1], "/v1/index/bulk"
         )
         self.assertEqual(metal.request.call_args[1]["json"]["data"], payload)
-    
+
     async def test_metal_index_many_with_indexid(self):
         my_index = "my-index"
         mock_text = "some text"
