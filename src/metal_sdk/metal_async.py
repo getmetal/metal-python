@@ -4,6 +4,7 @@ from typing import List
 import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
 import logging
+import json
 
 BASE_API = "https://api.getmetal.io"
 logger = logging.getLogger(__name__)
@@ -65,19 +66,38 @@ class Metal(httpx.AsyncClient):
 
     async def fetch(self, method, url, data):
         try:
-            res = await self.request(method, url, json=data)
+            res = await self.request(method, url, json=data)  # Use await here
+
+            if res.status_code == 204:
+                logger.info(f"Operation completed successfully: {url}")
+                return "Operation completed successfully"
+
             res.raise_for_status()
             return res.json()
         except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
+            response_data = e.response.text
+            try:
+                response_data = e.response.json()
+            except json.JSONDecodeError:
+                pass
+
             status_code = e.response.status_code
-            error_detail = response_data.get('error', {})
-            nested_message = error_detail.get('message')
-            top_level_message = response_data.get('message')
-            default_message = f"HTTP {status_code} error"
-            error_message = nested_message or top_level_message or default_message
-            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
+
+            if isinstance(response_data, dict):
+                error_detail = response_data.get('error', {})
+                nested_message = error_detail.get('message') if isinstance(error_detail, dict) else None
+                top_level_message = response_data.get('message')
+                immediate_error = response_data.get('error')
+            else:
+                nested_message = None
+                top_level_message = None
+                immediate_error = None
+
+            error_message = nested_message or top_level_message or immediate_error or f"HTTP {status_code} error"
+
+            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'='*60}\n"
             logger.exception(formatted_error)
+
             return response_data
 
     async def index(self, payload: IndexPayload = {}, index_id=None):
@@ -234,3 +254,57 @@ class Metal(httpx.AsyncClient):
         # Upload the file to the returned url
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
+
+    async def create_datasource(self, payload: dict, index_id=None):
+        index = index_id or self.index_id
+        if index is None:
+            raise TypeError("index_id required")
+
+        url = "/v1/datasources"
+        payload['index'] = index
+
+        res = await self.fetch("post", url, payload)
+        return res
+
+    async def get_datasource(self, id: str, index_id=None):
+        index = index_id or self.index_id
+
+        if id is None:
+            raise TypeError("id required")
+
+        if index is None:
+            raise TypeError("index_id required")
+
+        url = f"/v1/datasources/{id}"
+
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def delete_datasource(self, id: str, index_id=None):
+        index = index_id or self.index_id
+        if index is None:
+            raise TypeError("index_id required")
+
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+
+        res = await self.fetch("delete", url, None)
+        return res
+
+    async def update_datasource(self, id: str, payload: dict, index_id=None):
+        index = index_id or self.index_id
+
+        if index is None:
+            raise TypeError("index_id required")
+
+        if id is None:
+            raise TypeError("id required")
+
+        url = f"/v1/datasources/{id}"
+
+        payload['index'] = index
+
+        res = await self.fetch("put", url, payload)
+        return res
