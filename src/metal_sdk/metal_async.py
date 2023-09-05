@@ -66,7 +66,7 @@ class Metal(httpx.AsyncClient):
 
     async def fetch(self, method, url, data):
         try:
-            res = await self.request(method, url, json=data)  # Use await here
+            res = await self.request(method, url, json=data)
 
             if res.status_code == 204:
                 logger.info(f"Operation completed successfully: {url}")
