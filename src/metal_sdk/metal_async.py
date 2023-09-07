@@ -64,19 +64,18 @@ class Metal(httpx.AsyncClient):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    async def fetch(self, method, url, data):
+    async def fetch(self, method, url, data, params=None):
         try:
-            res = await self.request(method, url, json=data)
-
-            if res.status_code == 204:
-                logger.info(f"Operation completed successfully: {url}")
-                return "Operation completed successfully"
-
+            # Assume that you have an async version of the request method named "request_async"
+            res = await self.request_async(method, url, json=data, params=params)
             res.raise_for_status()
+            if not res.content:
+                return
             return res.json()
         except httpx.HTTPStatusError as e:
             response_data = e.response.text
             try:
+                # Try to decode it into a JSON object
                 response_data = e.response.json()
             except json.JSONDecodeError:
                 pass
@@ -98,7 +97,9 @@ class Metal(httpx.AsyncClient):
             formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'='*60}\n"
             logger.exception(formatted_error)
 
+            # Returning the error JSON body
             return response_data
+
 
     async def index(self, payload: IndexPayload = {}, index_id=None):
         index = self.index_id or index_id
@@ -255,56 +256,74 @@ class Metal(httpx.AsyncClient):
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
 
-    async def create_datasource(self, payload: dict, index_id=None):
-        index = index_id or self.index_id
-        if index is None:
-            raise TypeError("index_id required")
-
+    async def create_datasource(self, payload: dict):
         url = "/v1/datasources"
-        payload['index'] = index
-
         res = await self.fetch("post", url, payload)
         return res
 
-    async def get_datasource(self, id: str, index_id=None):
-        index = index_id or self.index_id
-
-        if id is None:
-            raise TypeError("id required")
-
-        if index is None:
-            raise TypeError("index_id required")
-
-        url = f"/v1/datasources/{id}"
-
-        res = await self.fetch("get", url, None)
-        return res
-
-    async def delete_datasource(self, id: str, index_id=None):
-        index = index_id or self.index_id
-        if index is None:
-            raise TypeError("index_id required")
-
+    async def get_datasource(self, id: str):
         if id is None:
             raise TypeError("datasource_id required")
 
         url = f"/v1/datasources/{id}"
+        res = await self.fetch("get", url, None)
+        return res
 
+    async def get_all_datasources(self, limit=None, offset=None):
+        url = "/v1/datasources"
+
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if offset is not None:
+            params['offset'] = offset
+
+        res = await self.fetch("get", url, params)
+        return res
+
+    async def delete_datasource(self, id: str):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
         res = await self.fetch("delete", url, None)
         return res
 
-    async def update_datasource(self, id: str, payload: dict, index_id=None):
-        index = index_id or self.index_id
-
-        if index is None:
-            raise TypeError("index_id required")
-
+    async def update_datasource(self, id: str, payload: dict):
         if id is None:
-            raise TypeError("id required")
+            raise TypeError("datasource_id required")
 
         url = f"/v1/datasources/{id}"
-
-        payload['index'] = index
-
         res = await self.fetch("put", url, payload)
+        return res
+
+    async def get_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def delete_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
+        res = await self.fetch("delete", url, None)
+        return res
+
+    async def get_all_dataentities(self, datasource_id: str, limit=None, offset=None):
+        if datasource_id is None:
+            raise TypeError("datasource ID required")
+
+        url = f"/v1/datasources/{datasource_id}/data-entities"
+
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if offset is not None:
+            params['offset'] = offset
+
+        res = await self.fetch("get", url, None, params)
         return res

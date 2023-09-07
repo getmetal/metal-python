@@ -64,19 +64,17 @@ class Metal(httpx.Client):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    def fetch(self, method, url, data):
+    def fetch(self, method, url, data, params=None):
         try:
-            res = self.request(method, url, json=data)
-
-            if res.status_code == 204:
-                logger.info(f"Operation completed successfully: {url}")
-                return "Operation completed successfully"
-
+            res = self.request(method, url, json=data, params=params)
             res.raise_for_status()
+            if not res.content:
+                return
             return res.json()
         except httpx.HTTPStatusError as e:
             response_data = e.response.text
             try:
+                # Try to decode it into a JSON object
                 response_data = e.response.json()
             except json.JSONDecodeError:
                 pass
@@ -98,6 +96,7 @@ class Metal(httpx.Client):
             formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'='*60}\n"
             logger.exception(formatted_error)
 
+            # Returning the error JSON body
             return response_data
 
     def index(self, payload: IndexPayload = {}, index_id=None):
@@ -253,59 +252,76 @@ class Metal(httpx.Client):
         self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
 
-    def create_datasource(self, payload: dict, index_id=None):
-        index = index_id or self.index_id
-
-        if index is None:
-            raise TypeError("index_id required")
-
+    def create_datasource(self, payload: dict):
         url = "/v1/datasources"
-
-        payload['index'] = index
-
         res = self.fetch("post", url, payload)
         return res
 
-    def get_datasource(self, id: str, index_id=None):
-        index = index_id or self.index_id
-
-        if id is None:
-            raise TypeError("id required")
-
-        if index is None:
-            raise TypeError("index_id required")
-
-        url = f"/v1/datasources/{id}"
-
-        res = self.fetch("get", url, None)
-        return res
-
-    def delete_datasource(self, id: str, index_id=None):
-
-        index = index_id or self.index_id
-        if index is None:
-            raise TypeError("index_id required")
-
+    def get_datasource(self, id: str):
         if id is None:
             raise TypeError("datasource_id required")
 
         url = f"/v1/datasources/{id}"
+        res = self.fetch("get", url, None)
+        return res
+
+    def get_all_datasources(self, limit=None, offset=None):
+        url = "/v1/datasources"
+
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if offset is not None:
+            params['offset'] = offset
+
+        res = self.fetch("get", url, params)
+        return res
+
+    def delete_datasource(self, id: str):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+        res = self.fetch("delete", url, None)
+        return res
+
+    def update_datasource(self, id: str, payload: dict):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+        res = self.fetch("put", url, payload)
+        return res
+
+    def get_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
+        res = self.fetch("get", url, None)
+        return res
+
+    def delete_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
 
         res = self.fetch("delete", url, None)
         return res
 
-    def update_datasource(self, id: str, payload: dict, index_id=None):
-        index = index_id or self.index_id
+    def get_all_dataentities(self, datasource_id: str, limit=None, offset=None):
 
-        if index is None:
-            raise TypeError("index_id required")
+        if datasource_id is None:
+            raise TypeError("datasource ID required")
 
-        if id is None:
-            raise TypeError("id required")
+        url = f"/v1/datasources/{datasource_id}/data-entities"
 
-        url = f"/v1/datasources/{id}"
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if offset is not None:
+            params['offset'] = offset
 
-        payload['index'] = index
-
-        res = self.fetch("put", url, payload)
+        res = self.fetch("get", url, None, params)
         return res
