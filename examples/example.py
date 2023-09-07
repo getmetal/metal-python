@@ -15,8 +15,7 @@ def main():
     # metal.index({ "id": "667", "text": "Dave Mustain" })
     # metal.index({ "id": "666", "text": "Ozzy" })
     # metal.index({ "id": "668", "text": "Bruce Dickenson" })
-    result = metal.search({"text": "908", "limit": 1})
-    print(result)
+    metal.search({"text": "908", "limit": 1})
 
 
 main()
