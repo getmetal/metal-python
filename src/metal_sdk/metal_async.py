@@ -4,7 +4,6 @@ from typing import List
 import httpx
 from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
 import logging
-import json
 
 BASE_API = "https://api.getmetal.io"
 logger = logging.getLogger(__name__)
@@ -76,7 +75,7 @@ class Metal(httpx.AsyncClient):
             response_data = e.response.text
             try:
                 response_data = e.response.json()
-            except json.JSONDecodeError:
+            except Exception:
                 pass
 
             status_code = e.response.status_code
