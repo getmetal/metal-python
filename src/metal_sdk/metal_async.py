@@ -64,10 +64,10 @@ class Metal(httpx.AsyncClient):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    async def fetch(self, method, url, data, params=None):
+    async def fetch(self, method, url, data):
         try:
-            # Assume that you have an async version of the request method named "request_async"
-            res = await self.request_async(method, url, json=data, params=params)
+            res = await self.request(method, url, json=data)
+
             res.raise_for_status()
             if not res.content:
                 return
@@ -75,7 +75,6 @@ class Metal(httpx.AsyncClient):
         except httpx.HTTPStatusError as e:
             response_data = e.response.text
             try:
-                # Try to decode it into a JSON object
                 response_data = e.response.json()
             except json.JSONDecodeError:
                 pass
@@ -97,9 +96,7 @@ class Metal(httpx.AsyncClient):
             formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'='*60}\n"
             logger.exception(formatted_error)
 
-            # Returning the error JSON body
             return response_data
-
 
     async def index(self, payload: IndexPayload = {}, index_id=None):
         index = self.index_id or index_id
