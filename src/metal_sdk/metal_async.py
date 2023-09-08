@@ -265,14 +265,14 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("get", url, None)
         return res
 
-    async def get_all_datasources(self, limit=None, offset=None):
+    async def get_all_datasources(self, limit=None, page=None):
         url = "/v1/datasources"
 
         params = {}
         if limit is not None:
             params['limit'] = limit
-        if offset is not None:
-            params['offset'] = offset
+        if page is not None:
+            params['page'] = page
 
         res = await self.fetch("get", url, params)
         return res
@@ -309,7 +309,7 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("delete", url, None)
         return res
 
-    async def get_all_dataentities(self, datasource_id: str, limit=None, offset=None):
+    async def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
         if datasource_id is None:
             raise TypeError("datasource ID required")
 
@@ -318,8 +318,8 @@ class Metal(httpx.AsyncClient):
         params = {}
         if limit is not None:
             params['limit'] = limit
-        if offset is not None:
-            params['offset'] = offset
+        if page is not None:
+            params['page'] = page
 
         res = await self.fetch("get", url, None, params)
         return res

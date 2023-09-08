@@ -264,14 +264,14 @@ class Metal(httpx.Client):
         res = self.fetch("get", url, None)
         return res
 
-    def get_all_datasources(self, limit=None, offset=None):
+    def get_all_datasources(self, limit=None, page=None):
         url = "/v1/datasources"
 
         params = {}
         if limit is not None:
             params['limit'] = limit
-        if offset is not None:
-            params['offset'] = offset
+        if page is not None:
+            params['page'] = page
 
         res = self.fetch("get", url, params)
         return res
@@ -309,7 +309,7 @@ class Metal(httpx.Client):
         res = self.fetch("delete", url, None)
         return res
 
-    def get_all_dataentities(self, datasource_id: str, limit=None, offset=None):
+    def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
 
         if datasource_id is None:
             raise TypeError("datasource ID required")
@@ -319,8 +319,8 @@ class Metal(httpx.Client):
         params = {}
         if limit is not None:
             params['limit'] = limit
-        if offset is not None:
-            params['offset'] = offset
+        if page is not None:
+            params['page'] = page
 
         res = self.fetch("get", url, None, params)
         return res
