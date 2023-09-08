@@ -66,18 +66,35 @@ class Metal(httpx.AsyncClient):
     async def fetch(self, method, url, data):
         try:
             res = await self.request(method, url, json=data)
+
             res.raise_for_status()
+            if not res.content:
+                return
             return res.json()
         except httpx.HTTPStatusError as e:
-            response_data = e.response.json()
+            response_data = e.response.text
+            try:
+                response_data = e.response.json()
+            except Exception:
+                pass
+
             status_code = e.response.status_code
-            error_detail = response_data.get('error', {})
-            nested_message = error_detail.get('message')
-            top_level_message = response_data.get('message')
-            default_message = f"HTTP {status_code} error"
-            error_message = nested_message or top_level_message or default_message
-            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'-'*60}\n"
+
+            if isinstance(response_data, dict):
+                error_detail = response_data.get('error', {})
+                nested_message = error_detail.get('message') if isinstance(error_detail, dict) else None
+                top_level_message = response_data.get('message')
+                immediate_error = response_data.get('error')
+            else:
+                nested_message = None
+                top_level_message = None
+                immediate_error = None
+
+            error_message = nested_message or top_level_message or immediate_error or f"HTTP {status_code} error"
+
+            formatted_error = f"\n{'='*60}\nError occurred while accessing {url}: {error_message}\n{'='*60}\n"
             logger.exception(formatted_error)
+
             return response_data
 
     async def index(self, payload: IndexPayload = {}, index_id=None):
@@ -234,3 +251,75 @@ class Metal(httpx.AsyncClient):
         # Upload the file to the returned url
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
+
+    async def create_datasource(self, payload: dict):
+        url = "/v1/datasources"
+        res = await self.fetch("post", url, payload)
+        return res
+
+    async def get_datasource(self, id: str):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def get_all_datasources(self, limit=None, page=None):
+        url = "/v1/datasources"
+
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if page is not None:
+            params['page'] = page
+
+        res = await self.fetch("get", url, params)
+        return res
+
+    async def delete_datasource(self, id: str):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+        res = await self.fetch("delete", url, None)
+        return res
+
+    async def update_datasource(self, id: str, payload: dict):
+        if id is None:
+            raise TypeError("datasource_id required")
+
+        url = f"/v1/datasources/{id}"
+        res = await self.fetch("put", url, payload)
+        return res
+
+    async def get_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def delete_dataentity(self, id: str):
+        if id is None:
+            raise TypeError("dataentity_id required")
+
+        url = f"/v1/data-entities/{id}"
+        res = await self.fetch("delete", url, None)
+        return res
+
+    async def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
+        if datasource_id is None:
+            raise TypeError("datasource ID required")
+
+        url = f"/v1/datasources/{datasource_id}/data-entities"
+
+        params = {}
+        if limit is not None:
+            params['limit'] = limit
+        if page is not None:
+            params['page'] = page
+
+        res = await self.fetch("get", url, None, params)
+        return res
