@@ -168,10 +168,10 @@ class Metal(httpx.Client):
         res = self.fetch("get", url, None)
         return res
 
-    def get_many(self, ids: list[str], index_id=None):
+    def get_many(self, ids: List[str], index_id=None):
         index = index_id or self.index_id
 
-        if 1 < len(ids) > 100:
+        if not (1 < len(ids) <= 100):
             raise TypeError("ids should be between 1 and 100")
 
         if index is None:
