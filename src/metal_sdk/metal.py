@@ -177,7 +177,7 @@ class Metal(httpx.Client):
         if index is None:
             raise TypeError("index_id required")
 
-        id_str = ids.join(",")
+        id_str = ",".join(ids)
 
         url = "/v1/indexes/" + index + "/documents/" + id_str
 
