@@ -235,7 +235,7 @@ class TestMetal(IsolatedAsyncioTestCase):
 
         metal.request = mock.AsyncMock(return_value=mock_response)
 
-        await metal.get_many(id)
+        await metal.get_many(ids)
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/dave,ozzy")

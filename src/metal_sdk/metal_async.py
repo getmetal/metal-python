@@ -168,7 +168,7 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("get", url, None)
         return res
 
-    async def get_many(self, ids: []str, index_id=None):
+    async def get_many(self, ids: list[str], index_id=None):
         index = index_id or self.index_id
 
         if 1 < len(ids) > 100:
