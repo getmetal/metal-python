@@ -168,6 +168,22 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("get", url, None)
         return res
 
+    async def get_many(self, ids: List[str], index_id=None):
+        index = index_id or self.index_id
+
+        if not (1 < len(ids) <= 100):
+            raise TypeError("ids should be between 1 and 100")
+
+        if index is None:
+            raise TypeError("index_id required")
+
+        id_str = ",".join(ids)
+
+        url = "/v1/indexes/" + index + "/documents/" + id_str
+
+        res = await self.fetch("get", url, None)
+        return res
+
     async def delete_one(self, id: str, index_id=None):
         index = index_id or self.index_id
 

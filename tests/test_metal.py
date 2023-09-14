@@ -197,6 +197,18 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/ozzy")
 
+    def test_metal_get_many_with_payload(self):
+        index_id = "index-id"
+        ids = ["ozzy", "mustain"]
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+        return_value = mock.MagicMock(json=lambda: {"ozzy": "black sabbath"})
+        metal.request = mock.MagicMock(return_value=return_value)
+
+        metal.get_many(ids)
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/ozzy,mustain")
+
     def test_metal_delete_one_with_payload(self):
         index_id = "index-id"
         id = "ozzy"

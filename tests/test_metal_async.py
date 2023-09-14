@@ -225,6 +225,21 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/dave")
 
+    async def test_metal_get_many_with_payload(self):
+        index_id = "index-id"
+        ids = ["dave", "ozzy"]
+        metal = Metal(API_KEY, CLIENT_ID, index_id)
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"data": "foo"}
+
+        metal.request = mock.AsyncMock(return_value=mock_response)
+
+        await metal.get_many(ids)
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/documents/dave,ozzy")
+
     async def test_metal_delete_one_with_payload(self):
         index_id = "index-id"
         id = "dave"
