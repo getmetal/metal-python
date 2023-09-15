@@ -308,6 +308,45 @@ class Metal(httpx.Client):
         res = self.fetch("put", url, payload)
         return res
 
+    def __create_dataentity_resource(self, datasource, filename, file_size):
+        url = '/v1/data-entities'
+        payload = {
+            'datasource': datasource,
+            'name': self.__sanitize_filename(filename),
+            'sourceType': "file",
+            "status": "active"
+        }
+        headers = {'x-metal-file-size': str(file_size)}
+
+        return self.fetch("post", url, payload, headers=headers)
+
+    def create_dataentity(self, datasource, file_path):
+
+        if datasource is None:
+            raise ValueError("Payload must contain a 'datasource' id")
+
+        if not os.path.exists(file_path):
+            raise ValueError(f"File '{file_path}' not found.")
+
+        file_size = os.path.getsize(file_path)
+        filename = os.path.basename(file_path)
+        file_type, _ = mimetypes.guess_type(file_path)
+
+        # Restrict to CSV and PDF files only.
+        supported_types = ['application/pdf', 'text/csv']
+        if file_type not in supported_types:
+            raise ValueError("Invalid file type. Supported types are: pdf, csv.")
+
+        resource = self.__create_dataentity_resource(datasource, filename, file_size)
+        if not resource or 'data' not in resource:
+            logger.error("Failed to create a data entity resource.")
+            return None
+
+        # Upload the file to the returned URL.
+        self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
+
+        return resource
+
     def get_dataentity(self, id: str):
         if id is None:
             raise TypeError("dataentity_id required")
