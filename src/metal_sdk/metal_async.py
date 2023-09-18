@@ -2,7 +2,7 @@ import os
 import mimetypes
 from typing import List
 import httpx
-from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload
 import logging
 
 BASE_API = "https://api.getmetal.io"
@@ -63,9 +63,9 @@ class Metal(httpx.AsyncClient):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    async def fetch(self, method, url, data):
+    async def fetch(self, method, url, data, params=None):
         try:
-            res = await self.request(method, url, json=data)
+            res = await self.request(method, url, json=data, params=params)
 
             res.raise_for_status()
             if not res.content:
@@ -268,7 +268,7 @@ class Metal(httpx.AsyncClient):
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
 
-    async def create_datasource(self, payload: dict):
+    async def create_datasource(self,  payload: DataSourcePayload = {}):
         url = "/v1/datasources"
         res = await self.fetch("post", url, payload)
         return res
@@ -331,11 +331,6 @@ class Metal(httpx.AsyncClient):
         file_size = os.path.getsize(file_path)
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
-
-        # Restrict to CSV and PDF files only.
-        supported_types = ['application/pdf', 'text/csv']
-        if file_type not in supported_types:
-            raise ValueError("Invalid file type. Supported types are: pdf, csv.")
 
         resource = await self.__create_dataentity_resource(datasource, filename, file_size)
         if not resource or 'data' not in resource:

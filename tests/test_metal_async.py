@@ -2,8 +2,7 @@ import os
 import respx
 from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
-from src.metal_sdk.metal_async import Metal
-
+from metal_sdk.metal_async import Metal
 
 API_KEY = "api-key"
 CLIENT_ID = "client-id"
@@ -302,3 +301,149 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(upload_args[1], mock_file_path)
         self.assertEqual(upload_args[2], "text/csv")
         self.assertEqual(upload_args[3], 1000)
+
+    async def test_metal_create_datasource_with_payload(self):
+        my_datasource = "my_datasource"
+        mock_metadata = [{"name": "some-name", "type": "string", "description": "some-description"}]
+        mock_sourcetype = "file"
+        mock_auto_extract = True
+        payload = {
+            "name": my_datasource,
+            "metadataFields": mock_metadata,
+            "sourcetype": mock_sourcetype,
+            "autoExtract": mock_auto_extract
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=201))
+        await metal.create_datasource(payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/datasources")
+        self.assertEqual(metal.request.call_args[1]["json"]["name"], my_datasource)
+        self.assertEqual(metal.request.call_args[1]["json"]["metadataFields"], payload["metadataFields"])
+
+    async def test_get_datasource_with_payload(self):
+        id = "datasource-id"
+        metal = Metal(API_KEY, CLIENT_ID)
+        return_value = mock.MagicMock(json=lambda: {"datasource": "sample data"})
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        result = await metal.get_datasource(id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/datasources/datasource-id")
+        self.assertEqual(result, return_value.json())
+
+    async def test_get_datasource_without_payload(self):
+        metal = Metal(API_KEY, CLIENT_ID)
+
+        with self.assertRaises(TypeError) as ctx:
+            await metal.get_datasource(None)
+
+        self.assertEqual(str(ctx.exception), "datasource_id required")
+
+    async def test_update_datasource_with_payload(self):
+        datasource_id = "datasource-id"
+        mock_name = "updated-datasource-name"
+        mock_metadata = [{"name": "updated-name", "type": "string", "description": "updated-description"}]
+        payload = {
+            "name": mock_name,
+            "metadataFields": mock_metadata,
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        return_value = mock.MagicMock(json=lambda: {"updated": True})
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        res = await metal.update_datasource(datasource_id, payload)
+
+        self.assertEqual(res['updated'], True)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "put")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/datasources/{datasource_id}")
+        self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_name)
+        self.assertEqual(metal.request.call_args[1]["json"]["metadataFields"], mock_metadata)
+
+    async def test_create_dataentity(self):
+        datasource_id = "datasource-id"
+
+        # Get the directory containing this file
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Build the path to the CSV file
+        mock_file_path = os.path.join(this_dir, 'fixtures', 'sample.csv')
+
+        metal = Metal(API_KEY, CLIENT_ID)
+
+        metal._Metal__create_dataentity_resource = mock.AsyncMock(return_value={
+            'data': {'url': 'https://mockuploadurl.com'}
+            })
+        metal._Metal__upload_file_to_url = mock.AsyncMock()
+
+        res = await metal.create_dataentity(datasource_id, mock_file_path)
+
+        self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
+
+        self.assertEqual(metal._Metal__create_dataentity_resource.call_count, 1)
+        self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
+
+        create_args = metal._Metal__create_dataentity_resource.call_args[0]
+        self.assertEqual(create_args[0], datasource_id)
+        self.assertEqual(create_args[1], "sample.csv")
+        self.assertEqual(create_args[2], 47)
+        upload_args = metal._Metal__upload_file_to_url.call_args[0]
+        self.assertEqual(upload_args[0], 'https://mockuploadurl.com')
+        self.assertEqual(upload_args[1], mock_file_path)
+        self.assertEqual(upload_args[2], "text/csv")
+        self.assertEqual(upload_args[3], 47)
+
+    async def test_metal_get_dataentity_with_id(self):
+        dataentity_id = "dataentity-id"
+        mock_return_value = {"data": "sample response"}
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        return_value = mock.MagicMock(json=lambda: mock_return_value)
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        await metal.get_dataentity(dataentity_id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{dataentity_id}")
+
+    async def test_metal_delete_dataentity_with_id(self):
+        dataentity_id = "dataentity-id"
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        return_value = mock.MagicMock(status_code=204)
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        await metal.delete_dataentity(dataentity_id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "delete")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{dataentity_id}")
+
+    async def test_metal_get_all_dataentities_with_datasource_id(self):
+        datasource_id = "datasource-id"
+        mock_limit = 10
+        mock_page = 2
+        metal = Metal(API_KEY, CLIENT_ID)
+        return_value = mock.MagicMock(json=lambda: {
+            "data": [
+                {"id": "dataentity-1", "name": "Entity 1"},
+                {"id": "dataentity-2", "name": "Entity 2"},
+                ]
+        })
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        await metal.get_all_dataentities(datasource_id, limit=mock_limit, page=mock_page)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/datasources/{datasource_id}/data-entities")
+        self.assertDictEqual(metal.request.call_args[1]["params"], {"limit": mock_limit, "page": mock_page})
