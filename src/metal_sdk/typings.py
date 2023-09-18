@@ -60,3 +60,16 @@ class MotorheadPayload(TypedDict):
     api_key: NotRequired[str]
     client_id: NotRequired[str]
     base_url: NotRequired[str]
+
+
+class MetadataField(TypedDict):
+    name: NotRequired[str]
+    type: NotRequired[str]
+    description: NotRequired[str]
+
+
+class DataSourcePayload(TypedDict):
+    name: NotRequired[str]
+    metadataFields: NotRequired[List[MetadataField]]
+    sourcetype: NotRequired[str]
+    autoExtract: NotRequired[bool]
