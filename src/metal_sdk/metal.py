@@ -2,7 +2,7 @@ import os
 import mimetypes
 import httpx
 from typing import List
-from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload, CreateIndexPayload
 import logging
 
 BASE_API = "https://api.getmetal.io"
@@ -373,4 +373,9 @@ class Metal(httpx.Client):
         url = f"/v1/data-entities/{id}"
 
         res = self.fetch("delete", url, None)
+        return res
+
+    def create_index(self, payload: CreateIndexPayload) -> dict:
+        url = "v1/indexes"
+        res = self.fetch("post", url, payload)
         return res

@@ -2,7 +2,7 @@ import os
 import mimetypes
 from typing import List
 import httpx
-from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload, CreateIndexPayload
 import logging
 
 BASE_API = "https://api.getmetal.io"
@@ -370,4 +370,9 @@ class Metal(httpx.AsyncClient):
             params['page'] = page
 
         res = await self.fetch("get", url, None, params)
+        return res
+
+    async def create_index(self, payload: CreateIndexPayload) -> dict:
+        url = "v1/indexes"
+        res = await self.fetch("post", url, payload)
         return res

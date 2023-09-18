@@ -4,6 +4,7 @@ from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
 from src.metal_sdk.metal_async import Metal
 
+
 API_KEY = "api-key"
 CLIENT_ID = "client-id"
 
@@ -447,3 +448,28 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], f"/v1/datasources/{datasource_id}/data-entities")
         self.assertDictEqual(metal.request.call_args[1]["params"], {"limit": mock_limit, "page": mock_page})
+
+    async def test_metal_create_index_with_payload(self):
+        mock_index_name = "test_index"
+        mock_datasource = "test_datasource"
+        mock_model = "test_model"
+        mock_filters = [{"field": "test_field", "operator": "equals", "value": "test_value"}]
+
+        payload = {
+            "model": mock_model,
+            "datasource": mock_datasource,
+            "name": mock_index_name,
+            "filters": mock_filters
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=201))
+        await metal.create_index(payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "v1/indexes")
+        self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_index_name)
+        self.assertEqual(metal.request.call_args[1]["json"]["datasource"], mock_datasource)
+        self.assertEqual(metal.request.call_args[1]["json"]["model"], mock_model)
+        self.assertEqual(metal.request.call_args[1]["json"]["filters"], mock_filters)

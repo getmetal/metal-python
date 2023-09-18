@@ -73,3 +73,15 @@ class DataSourcePayload(TypedDict):
     metadataFields: NotRequired[List[MetadataField]]
     sourcetype: NotRequired[str]
     autoExtract: NotRequired[bool]
+
+
+class FiltersField(TypedDict):
+    field: NotRequired[str]
+    type: NotRequired[str]
+
+
+class CreateIndexPayload(TypedDict):
+    model: NotRequired[str]
+    datasource: NotRequired[str]
+    name: NotRequired[str]
+    filters: NotRequired[List[FiltersField]]
