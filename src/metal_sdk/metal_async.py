@@ -2,7 +2,7 @@ import os
 import mimetypes
 from typing import List
 import httpx
-from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem
+from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload, CreateIndexPayload
 import logging
 
 BASE_API = "https://api.getmetal.io"
@@ -63,9 +63,9 @@ class Metal(httpx.AsyncClient):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    async def fetch(self, method, url, data):
+    async def fetch(self, method, url, data, params=None):
         try:
-            res = await self.request(method, url, json=data)
+            res = await self.request(method, url, json=data, params=params)
 
             res.raise_for_status()
             if not res.content:
@@ -268,7 +268,7 @@ class Metal(httpx.AsyncClient):
         await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
 
-    async def create_datasource(self, payload: dict):
+    async def add_datasource(self,  payload: DataSourcePayload = {}):
         url = "/v1/datasources"
         res = await self.fetch("post", url, payload)
         return res
@@ -309,23 +309,55 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("put", url, payload)
         return res
 
-    async def get_dataentity(self, id: str):
+    async def __add_data_entity_resource(self, datasource, filename, file_size):
+        url = '/v1/data-entities'
+        payload = {
+            'datasource': datasource,
+            'name': self.__sanitize_filename(filename),
+            'sourceType': "file",
+            "status": "active"
+        }
+        headers = {'x-metal-file-size': str(file_size)}
+
+        return await self.fetch("post", url, payload, headers=headers)
+
+    async def add_data_entity(self, datasource, file_path):
+        if datasource is None:
+            raise ValueError("Payload must contain a 'datasource' id")
+
+        if not os.path.exists(file_path):
+            raise ValueError(f"File '{file_path}' not found.")
+
+        file_size = os.path.getsize(file_path)
+        filename = os.path.basename(file_path)
+        file_type, _ = mimetypes.guess_type(file_path)
+
+        resource = await self.__add_data_entity_resource(datasource, filename, file_size)
+        if not resource or 'data' not in resource:
+            logger.error("Failed to create a data entity resource.")
+            return None
+
+        await self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
+
+        return resource
+
+    async def get_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
         res = await self.fetch("get", url, None)
         return res
 
-    async def delete_dataentity(self, id: str):
+    async def delete_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
         res = await self.fetch("delete", url, None)
         return res
 
-    async def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
+    async def get_all_data_entities(self, datasource_id: str, limit=None, page=None):
         if datasource_id is None:
             raise TypeError("datasource ID required")
 
@@ -338,4 +370,9 @@ class Metal(httpx.AsyncClient):
             params['page'] = page
 
         res = await self.fetch("get", url, None, params)
+        return res
+
+    async def add_index(self, payload: CreateIndexPayload) -> dict:
+        url = "v1/indexes"
+        res = await self.fetch("post", url, payload)
         return res
