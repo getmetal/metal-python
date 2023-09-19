@@ -309,7 +309,7 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("put", url, payload)
         return res
 
-    async def __create_dataentity_resource(self, datasource, filename, file_size):
+    async def __create_data_entity_resource(self, datasource, filename, file_size):
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
@@ -321,7 +321,7 @@ class Metal(httpx.AsyncClient):
 
         return await self.fetch("post", url, payload, headers=headers)
 
-    async def create_dataentity(self, datasource, file_path):
+    async def create_data_entity(self, datasource, file_path):
         if datasource is None:
             raise ValueError("Payload must contain a 'datasource' id")
 
@@ -332,7 +332,7 @@ class Metal(httpx.AsyncClient):
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
 
-        resource = await self.__create_dataentity_resource(datasource, filename, file_size)
+        resource = await self.__create_data_entity_resource(datasource, filename, file_size)
         if not resource or 'data' not in resource:
             logger.error("Failed to create a data entity resource.")
             return None
@@ -341,23 +341,23 @@ class Metal(httpx.AsyncClient):
 
         return resource
 
-    async def get_dataentity(self, id: str):
+    async def get_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
         res = await self.fetch("get", url, None)
         return res
 
-    async def delete_dataentity(self, id: str):
+    async def delete_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
         res = await self.fetch("delete", url, None)
         return res
 
-    async def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
+    async def get_all_data_entities(self, datasource_id: str, limit=None, page=None):
         if datasource_id is None:
             raise TypeError("datasource ID required")
 

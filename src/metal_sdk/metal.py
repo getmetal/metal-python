@@ -308,7 +308,7 @@ class Metal(httpx.Client):
         res = self.fetch("put", url, payload)
         return res
 
-    def __create_dataentity_resource(self, datasource, filename, file_size):
+    def __create_data_entity_resource(self, datasource, filename, file_size):
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
@@ -320,7 +320,7 @@ class Metal(httpx.Client):
 
         return self.fetch("post", url, payload, headers=headers)
 
-    def create_dataentity(self, datasource, file_path):
+    def create_data_entity(self, datasource, file_path):
 
         if datasource is None:
             raise ValueError("Payload must contain a 'datasource' id")
@@ -332,7 +332,7 @@ class Metal(httpx.Client):
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
 
-        resource = self.__create_dataentity_resource(datasource, filename, file_size)
+        resource = self.__create_data_entity_resource(datasource, filename, file_size)
         if not resource or 'data' not in resource:
             logger.error("Failed to create a data entity resource.")
             return None
@@ -342,15 +342,15 @@ class Metal(httpx.Client):
 
         return resource
 
-    def get_dataentity(self, id: str):
+    def get_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
         res = self.fetch("get", url, None)
         return res
 
-    def get_all_dataentities(self, datasource_id: str, limit=None, page=None):
+    def get_all_data_entities(self, datasource_id: str, limit=None, page=None):
 
         if datasource_id is None:
             raise TypeError("datasource ID required")
@@ -366,9 +366,9 @@ class Metal(httpx.Client):
         res = self.fetch("get", url, None, params)
         return res
 
-    def delete_dataentity(self, id: str):
+    def delete_data_entity(self, id: str):
         if id is None:
-            raise TypeError("dataentity_id required")
+            raise TypeError("data_entity_id required")
 
         url = f"/v1/data-entities/{id}"
 

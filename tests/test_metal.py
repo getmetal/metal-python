@@ -401,7 +401,7 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_name)
         self.assertEqual(metal.request.call_args[1]["json"]["metadataFields"], mock_metadata)
 
-    def test_create_dataentity(self):
+    def test_create_data_entity(self):
         datasource_id = "datasource-id"
 
         # Get the directory containing this file
@@ -412,19 +412,19 @@ class TestMetal(TestCase):
 
         metal = Metal(API_KEY, CLIENT_ID)
 
-        metal._Metal__create_dataentity_resource = mock.MagicMock(return_value={
+        metal._Metal__create_data_entity_resource = mock.MagicMock(return_value={
             'data': {'url': 'https://mockuploadurl.com'}
             })
         metal._Metal__upload_file_to_url = mock.MagicMock()
 
-        res = metal.create_dataentity(datasource_id, mock_file_path)
+        res = metal.create_data_entity(datasource_id, mock_file_path)
 
         self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
 
-        self.assertEqual(metal._Metal__create_dataentity_resource.call_count, 1)
+        self.assertEqual(metal._Metal__create_data_entity_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
 
-        create_args = metal._Metal__create_dataentity_resource.call_args[0]
+        create_args = metal._Metal__create_data_entity_resource.call_args[0]
         self.assertEqual(create_args[0], datasource_id)
         self.assertEqual(create_args[1], "sample.csv")
         self.assertEqual(create_args[2], 47)
@@ -434,47 +434,47 @@ class TestMetal(TestCase):
         self.assertEqual(upload_args[2], "text/csv")
         self.assertEqual(upload_args[3], 47)
 
-    def test_metal_get_dataentity_with_id(self):
-        dataentity_id = "dataentity-id"
+    def test_metal_get_data_entity_with_id(self):
+        data_entity_id = "data_entity-id"
         mock_return_value = {"data": "sample response"}
 
         metal = Metal(API_KEY, CLIENT_ID)
         return_value = mock.MagicMock(json=lambda: mock_return_value)
         metal.request = mock.MagicMock(return_value=return_value)
 
-        metal.get_dataentity(dataentity_id)
+        metal.get_data_entity(data_entity_id)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
-        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{dataentity_id}")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{data_entity_id}")
 
-    def test_metal_delete_dataentity_with_id(self):
-        dataentity_id = "dataentity-id"
+    def test_metal_delete_data_entity_with_id(self):
+        data_entity_id = "data_entity-id"
 
         metal = Metal(API_KEY, CLIENT_ID)
         return_value = mock.MagicMock(status_code=204)
         metal.request = mock.MagicMock(return_value=return_value)
 
-        metal.delete_dataentity(dataentity_id)
+        metal.delete_data_entity(data_entity_id)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "delete")
-        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{dataentity_id}")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/data-entities/{data_entity_id}")
 
-    def test_metal_get_all_dataentities_with_datasource_id(self):
+    def test_metal_get_all_data_entities_with_datasource_id(self):
         datasource_id = "datasource-id"
         mock_limit = 10
         mock_page = 2
         metal = Metal(API_KEY, CLIENT_ID)
         return_value = mock.MagicMock(json=lambda: {
             "data": [
-                {"id": "dataentity-1", "name": "Entity 1"},
-                {"id": "dataentity-2", "name": "Entity 2"},
+                {"id": "data_entity-1", "name": "Entity 1"},
+                {"id": "data_entity-2", "name": "Entity 2"},
                 ]
         })
         metal.request = mock.MagicMock(return_value=return_value)
 
-        metal.get_all_dataentities(datasource_id, limit=mock_limit, page=mock_page)
+        metal.get_all_data_entities(datasource_id, limit=mock_limit, page=mock_page)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
