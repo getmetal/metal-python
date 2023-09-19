@@ -267,7 +267,7 @@ class Metal(httpx.Client):
         self.__upload_file_to_url(resource['data']['url'], file_path, file_type, file_size)
         return resource
 
-    def create_datasource(self, payload: DataSourcePayload = {}):
+    def add_datasource(self, payload: DataSourcePayload = {}):
         url = "/v1/datasources"
         res = self.fetch("post", url, payload)
         return res
@@ -308,7 +308,7 @@ class Metal(httpx.Client):
         res = self.fetch("put", url, payload)
         return res
 
-    def __create_data_entity_resource(self, datasource, filename, file_size):
+    def __add_data_entity_resource(self, datasource, filename, file_size):
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
@@ -320,7 +320,7 @@ class Metal(httpx.Client):
 
         return self.fetch("post", url, payload, headers=headers)
 
-    def create_data_entity(self, datasource, file_path):
+    def add_data_entity(self, datasource, file_path):
 
         if datasource is None:
             raise ValueError("Payload must contain a 'datasource' id")
@@ -332,7 +332,7 @@ class Metal(httpx.Client):
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
 
-        resource = self.__create_data_entity_resource(datasource, filename, file_size)
+        resource = self.__add_data_entity_resource(datasource, filename, file_size)
         if not resource or 'data' not in resource:
             logger.error("Failed to create a data entity resource.")
             return None
@@ -375,7 +375,7 @@ class Metal(httpx.Client):
         res = self.fetch("delete", url, None)
         return res
 
-    def create_index(self, payload: CreateIndexPayload) -> dict:
+    def add_index(self, payload: CreateIndexPayload) -> dict:
         url = "v1/indexes"
         res = self.fetch("post", url, payload)
         return res

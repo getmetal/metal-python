@@ -303,7 +303,7 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(upload_args[2], "text/csv")
         self.assertEqual(upload_args[3], 1000)
 
-    async def test_metal_create_datasource_with_payload(self):
+    async def test_metal_add_datasource_with_payload(self):
         my_datasource = "my_datasource"
         mock_metadata = [{"name": "some-name", "type": "string", "description": "some-description"}]
         mock_sourcetype = "file"
@@ -317,7 +317,7 @@ class TestMetal(IsolatedAsyncioTestCase):
 
         metal = Metal(API_KEY, CLIENT_ID)
         metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=201))
-        await metal.create_datasource(payload)
+        await metal.add_datasource(payload)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "post")
@@ -369,7 +369,7 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_name)
         self.assertEqual(metal.request.call_args[1]["json"]["metadataFields"], mock_metadata)
 
-    async def test_create_data_entity(self):
+    async def test_add_data_entity(self):
         datasource_id = "datasource-id"
 
         # Get the directory containing this file
@@ -380,19 +380,19 @@ class TestMetal(IsolatedAsyncioTestCase):
 
         metal = Metal(API_KEY, CLIENT_ID)
 
-        metal._Metal__create_data_entity_resource = mock.AsyncMock(return_value={
+        metal._Metal__add_data_entity_resource = mock.AsyncMock(return_value={
             'data': {'url': 'https://mockuploadurl.com'}
             })
         metal._Metal__upload_file_to_url = mock.AsyncMock()
 
-        res = await metal.create_data_entity(datasource_id, mock_file_path)
+        res = await metal.add_data_entity(datasource_id, mock_file_path)
 
         self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
 
-        self.assertEqual(metal._Metal__create_data_entity_resource.call_count, 1)
+        self.assertEqual(metal._Metal__add_data_entity_resource.call_count, 1)
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
 
-        create_args = metal._Metal__create_data_entity_resource.call_args[0]
+        create_args = metal._Metal__add_data_entity_resource.call_args[0]
         self.assertEqual(create_args[0], datasource_id)
         self.assertEqual(create_args[1], "sample.csv")
         self.assertEqual(create_args[2], 47)
@@ -449,7 +449,7 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[0][1], f"/v1/datasources/{datasource_id}/data-entities")
         self.assertDictEqual(metal.request.call_args[1]["params"], {"limit": mock_limit, "page": mock_page})
 
-    async def test_metal_create_index_with_payload(self):
+    async def test_metal_add_index_with_payload(self):
         mock_index_name = "test_index"
         mock_datasource = "test_datasource"
         mock_model = "test_model"
@@ -464,7 +464,7 @@ class TestMetal(IsolatedAsyncioTestCase):
 
         metal = Metal(API_KEY, CLIENT_ID)
         metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=201))
-        await metal.create_index(payload)
+        await metal.add_index(payload)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "post")
