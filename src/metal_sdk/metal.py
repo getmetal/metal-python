@@ -63,9 +63,9 @@ class Metal(httpx.Client):
         ):
             raise TypeError("imageBase64, imageUrl, text, or embedding required")
 
-    def fetch(self, method, url, data, params=None):
+    def fetch(self, method, url, data, params=None, headers=None):
         try:
-            res = self.request(method, url, json=data, params=params)
+            res = self.request(method, url, json=data, params=params, headers=headers)
             res.raise_for_status()
             if not res.content:
                 return
