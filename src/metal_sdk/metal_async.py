@@ -14,8 +14,8 @@ class Metal(httpx.AsyncClient):
     client_id: str
     index_id: str
 
-    def __init__(self, api_key, client_id, index_id=None, base_url=BASE_API):
-        super().__init__()
+    def __init__(self, api_key, client_id, index_id=None, base_url=BASE_API, timeout=30.0):
+        super().__init__(timeout=timeout)
         self.api_key = api_key
         self.client_id = client_id
         self.index_id = index_id
