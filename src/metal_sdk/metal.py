@@ -308,20 +308,32 @@ class Metal(httpx.Client):
         res = self.fetch("put", url, payload)
         return res
 
-    def __add_data_entity_resource(self, datasource, filename, file_size):
+    def validate_metadata(metadata):
+        if metadata is not None:
+            if not isinstance(metadata, dict):
+                raise TypeError("Metadata must be a dictionary.")
+            for key, value in metadata.items():
+                if not isinstance(key, str) or not (isinstance(value, str) or isinstance(value, int)):
+                    raise TypeError("Metadata keys must be strings, and values must be strings or numbers.")
+
+
+    def __add_data_entity_resource(self, datasource, filename, file_size, metadata=None):
+        validate_metadata(metadata)
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
             'name': self.__sanitize_filename(filename),
             'sourceType': "file",
-            "status": "active"
         }
+
+        if metadata is not None:
+            payload['metadata'] = metadata
+
         headers = {'x-metal-file-size': str(file_size)}
 
         return self.fetch("post", url, payload, headers=headers)
 
-    def add_data_entity(self, datasource, file_path):
-
+    def add_data_entity(self, datasource, file_path, metadata=None):
         if datasource is None:
             raise ValueError("Payload must contain a 'datasource' id")
 
@@ -332,7 +344,7 @@ class Metal(httpx.Client):
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
 
-        resource = self.__add_data_entity_resource(datasource, filename, file_size)
+        resource = self.__add_data_entity_resource(datasource, filename, file_size, metadata=metadata)
         if not resource or 'data' not in resource:
             logger.error("Failed to create a data entity resource.")
             return None

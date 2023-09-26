@@ -309,19 +309,19 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("put", url, payload)
         return res
 
-    async def __add_data_entity_resource(self, datasource, filename, file_size):
+    async def __add_data_entity_resource(self, datasource, filename, file_size, metadata=None):
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
             'name': self.__sanitize_filename(filename),
             'sourceType': "file",
-            "status": "active"
+            "metadata": metadata
         }
         headers = {'x-metal-file-size': str(file_size)}
 
         return await self.fetch("post", url, payload, headers=headers)
 
-    async def add_data_entity(self, datasource, file_path):
+    async def add_data_entity(self, datasource, file_path, metadata=None):
         if datasource is None:
             raise ValueError("Payload must contain a 'datasource' id")
 
@@ -332,7 +332,7 @@ class Metal(httpx.AsyncClient):
         filename = os.path.basename(file_path)
         file_type, _ = mimetypes.guess_type(file_path)
 
-        resource = await self.__add_data_entity_resource(datasource, filename, file_size)
+        resource = await self.__add_data_entity_resource(datasource, filename, file_size, metadata=metadata)
         if not resource or 'data' not in resource:
             logger.error("Failed to create a data entity resource.")
             return None
