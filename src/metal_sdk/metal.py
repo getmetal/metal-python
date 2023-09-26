@@ -308,7 +308,7 @@ class Metal(httpx.Client):
         res = self.fetch("put", url, payload)
         return res
 
-    def validate_metadata(metadata):
+    def __validate_metadata(self, metadata):
         if metadata is not None:
             if not isinstance(metadata, dict):
                 raise TypeError("Metadata must be a dictionary.")
@@ -316,9 +316,8 @@ class Metal(httpx.Client):
                 if not isinstance(key, str) or not (isinstance(value, str) or isinstance(value, int)):
                     raise TypeError("Metadata keys must be strings, and values must be strings or numbers.")
 
-
     def __add_data_entity_resource(self, datasource, filename, file_size, metadata=None):
-        validate_metadata(metadata)
+        self.__validate_metadata(metadata)
         url = '/v1/data-entities'
         payload = {
             'datasource': datasource,
