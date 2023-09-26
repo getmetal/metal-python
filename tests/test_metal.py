@@ -417,7 +417,7 @@ class TestMetal(TestCase):
             })
         metal._Metal__upload_file_to_url = mock.MagicMock()
 
-        res = metal.add_data_entity(datasource_id, mock_file_path)
+        res = metal.add_data_entity(datasource_id, mock_file_path, metadata={'vocalist': 'ozzy'})
 
         self.assertEqual(res['data']['url'], 'https://mockuploadurl.com')
 
@@ -425,6 +425,9 @@ class TestMetal(TestCase):
         self.assertEqual(metal._Metal__upload_file_to_url.call_count, 1)
 
         create_args = metal._Metal__add_data_entity_resource.call_args[0]
+        create_kwargs = metal._Metal__add_data_entity_resource.call_args[1]
+        self.assertEqual(create_kwargs['metadata']['vocalist'], 'ozzy')
+
         self.assertEqual(create_args[0], datasource_id)
         self.assertEqual(create_args[1], "sample.csv")
         self.assertEqual(create_args[2], 47)
