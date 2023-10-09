@@ -473,3 +473,19 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["datasource"], mock_datasource)
         self.assertEqual(metal.request.call_args[1]["json"]["model"], mock_model)
         self.assertEqual(metal.request.call_args[1]["json"]["filters"], mock_filters)
+
+    async def test_metal_update_index_with_payload(self):
+        mock_index_id = "test_index"
+
+        payload = {
+            "status": "UNARCHIVED",
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=200))
+        await metal.update_index(mock_index_id, payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "v1/indexes/test_index")
+        self.assertEqual(metal.request.call_args[1]["json"]["status"], "UNARCHIVED")
