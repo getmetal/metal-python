@@ -512,7 +512,7 @@ class TestMetal(TestCase):
     def test_metal_update_index_with_payload(self):
         mock_index_id = "test_index"
         payload = {
-            "status": "ARCHIVED",
+            "status": "DEACTIVATING",
         }
 
         metal = Metal(API_KEY, CLIENT_ID)
@@ -522,4 +522,4 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "put")
         self.assertEqual(metal.request.call_args[0][1], "v1/indexes/test_index")
-        self.assertEqual(metal.request.call_args[1]["json"]["status"], "ARCHIVED")
+        self.assertEqual(metal.request.call_args[1]["json"]["status"], "DEACTIVATING")
