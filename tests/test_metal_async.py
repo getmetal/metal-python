@@ -486,6 +486,6 @@ class TestMetal(IsolatedAsyncioTestCase):
         await metal.update_index(mock_index_id, payload)
 
         self.assertEqual(metal.request.call_count, 1)
-        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][0], "put")
         self.assertEqual(metal.request.call_args[0][1], "v1/indexes/test_index")
         self.assertEqual(metal.request.call_args[1]["json"]["status"], "UNARCHIVED")

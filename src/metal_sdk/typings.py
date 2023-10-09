@@ -91,5 +91,6 @@ class CreateIndexPayload(TypedDict):
     name: NotRequired[str]
     filters: NotRequired[List[FiltersField]]
 
+
 class UpdateIndexPayload(TypedDict):
     status: IndexStatus

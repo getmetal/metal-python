@@ -2,7 +2,15 @@ import os
 import mimetypes
 from typing import List
 import httpx
-from .typings import IndexPayload, SearchPayload, TunePayload, BulkIndexItem, DataSourcePayload, CreateIndexPayload, UpdateIndexPayload
+from .typings import (
+    IndexPayload,
+    SearchPayload,
+    TunePayload,
+    BulkIndexItem,
+    DataSourcePayload,
+    CreateIndexPayload,
+    UpdateIndexPayload,
+)
 import logging
 
 BASE_API = "https://api.getmetal.io"
