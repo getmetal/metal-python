@@ -10,6 +10,11 @@ class TuneLabel(Enum):
     POSITIVE = 1
 
 
+class IndexStatus(Enum):
+    ARCHIVED = "ARCHIVED"
+    UNARCHIVED = "UNARCHIVED"
+
+
 class IndexPayload(TypedDict):
     id: NotRequired[str]
     imageBase64: NotRequired[str]
@@ -85,3 +90,7 @@ class CreateIndexPayload(TypedDict):
     datasource: NotRequired[str]
     name: NotRequired[str]
     filters: NotRequired[List[FiltersField]]
+
+
+class UpdateIndexPayload(TypedDict):
+    status: IndexStatus
