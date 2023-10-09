@@ -11,7 +11,7 @@ class TuneLabel(Enum):
 
 
 class IndexStatus(Enum):
-    ARCHIVED = "ARCHIVED"
+    DEACTIVATING = "DEACTIVATING"
     UNARCHIVED = "UNARCHIVED"
 
 
