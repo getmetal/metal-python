@@ -404,3 +404,12 @@ class Metal(httpx.Client):
 
         res = self.fetch("put", url, payload)
         return res
+
+    def get_queries(self, index_id: str) -> dict:
+        if not index_id:
+            raise TypeError("index_id required")
+
+        url = f"/v1/indexes/{index_id}/queries"
+
+        res = self.fetch("get", url, None)
+        return res

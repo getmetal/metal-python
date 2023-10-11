@@ -398,3 +398,12 @@ class Metal(httpx.AsyncClient):
         url = f"v1/indexes/{index_id}"
         res = await self.fetch("put", url, payload)
         return res
+
+    async def get_queries(self, index_id: str) -> dict:
+        if not index_id:
+            raise TypeError("index_id required")
+
+        url = f"/v1/indexes/{index_id}/queries"
+
+        res = await self.fetch("get", url, None)
+        return res

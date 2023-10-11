@@ -523,3 +523,25 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[0][0], "put")
         self.assertEqual(metal.request.call_args[0][1], "v1/indexes/test_index")
         self.assertEqual(metal.request.call_args[1]["json"]["status"], "DEACTIVATING")
+
+    def test_metal_get_queries(self):
+        mock_index_id = "index-id"
+        metal = Metal(API_KEY, CLIENT_ID)
+
+        return_value = mock.MagicMock(json=lambda: {
+            "data": [
+                {
+                  "t": "2023-08-30T11:34:35.128Z",
+                  "d": 0.176956892014,
+                  "q": "Who is the best drummer of all time?"
+                }
+            ]
+        })
+
+        metal.request = mock.MagicMock(return_value=return_value)
+
+        metal.get_queries(mock_index_id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/queries")
