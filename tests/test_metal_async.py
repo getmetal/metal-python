@@ -2,7 +2,7 @@ import os
 import respx
 from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
-from src.metal_sdk.metal_async import Metal
+from metal_sdk.metal_async import Metal
 
 
 API_KEY = "api-key"
@@ -504,7 +504,7 @@ class TestMetal(IsolatedAsyncioTestCase):
             ]
         })
 
-        metal.request = mock.MagicMock(return_value=return_value)
+        metal.request = mock.AsyncMock(return_value=return_value)
         await metal.get_queries(mock_index_id)
 
         self.assertEqual(metal.request.call_count, 1)
