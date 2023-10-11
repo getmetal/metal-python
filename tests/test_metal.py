@@ -526,7 +526,7 @@ class TestMetal(TestCase):
 
     def test_metal_get_queries(self):
         index_id = "index-id"
-        metal = Metal(API_KEY, CLIENT_ID, index_id)
+        metal = Metal(API_KEY, CLIENT_ID)
 
         return_value = mock.MagicMock(json=lambda: {
             "data": [
