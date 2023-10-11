@@ -525,7 +525,7 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["status"], "DEACTIVATING")
 
     def test_metal_get_queries(self):
-        index_id = "index-id"
+        mock_index_id = "index-id"
         metal = Metal(API_KEY, CLIENT_ID)
 
         return_value = mock.MagicMock(json=lambda: {
@@ -540,7 +540,7 @@ class TestMetal(TestCase):
 
         metal.request = mock.MagicMock(return_value=return_value)
 
-        metal.get_queries(index_id)
+        metal.get_queries(mock_index_id)
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
