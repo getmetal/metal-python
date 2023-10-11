@@ -2,7 +2,7 @@ import os
 import respx
 from httpx import Response
 from unittest import TestCase, mock
-from metal_sdk.metal import Metal
+from src.metal_sdk.metal import Metal
 
 
 API_KEY = "api-key"

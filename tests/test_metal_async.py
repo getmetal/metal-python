@@ -2,7 +2,7 @@ import os
 import respx
 from httpx import Response
 from unittest import IsolatedAsyncioTestCase, mock
-from metal_sdk.metal_async import Metal
+from src.metal_sdk.metal_async import Metal
 
 
 API_KEY = "api-key"
