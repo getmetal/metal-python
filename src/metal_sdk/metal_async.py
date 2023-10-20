@@ -10,6 +10,7 @@ from .typings import (
     DataSourcePayload,
     CreateIndexPayload,
     UpdateIndexPayload,
+    CreateAppPayload,
 )
 import logging
 
@@ -404,6 +405,28 @@ class Metal(httpx.AsyncClient):
             raise TypeError("index_id required")
 
         url = f"/v1/indexes/{index_id}/queries"
+
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def add_app(self, payload: CreateAppPayload) -> dict:
+        url = "v1/apps"
+
+        res = await self.fetch("post", url, payload)
+        return res
+
+    async def get_app(self, app_id: str) -> dict:
+        if not app_id:
+            raise TypeError("app_id required")
+        if len(app_id) != 24:
+            raise ValueError("app_id must have a length of 24 characters")
+
+        url = f"/v1/apps/{app_id}"
+        res = await self.fetch("get", url, None)
+        return res
+
+    async def get_all_apps(self) -> dict:
+        url = "/v1/apps"
 
         res = await self.fetch("get", url, None)
         return res
