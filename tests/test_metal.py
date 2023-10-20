@@ -565,7 +565,7 @@ class TestMetal(TestCase):
     def test_metal_get_all_apps(self):
         metal = Metal(API_KEY, CLIENT_ID)
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
-        metal.get_all_apps()
+        metal.get_apps()
 
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
