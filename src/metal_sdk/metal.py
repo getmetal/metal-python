@@ -431,7 +431,7 @@ class Metal(httpx.Client):
         res = self.fetch("get", url, None)
         return res
 
-    def get_all_apps(self) -> dict:
+    def get_apps(self) -> dict:
         url = "/v1/apps"
 
         res = self.fetch("get", url, None)

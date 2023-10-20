@@ -425,7 +425,7 @@ class Metal(httpx.AsyncClient):
         res = await self.fetch("get", url, None)
         return res
 
-    async def get_all_apps(self) -> dict:
+    async def get_apps(self) -> dict:
         url = "/v1/apps"
 
         res = await self.fetch("get", url, None)
