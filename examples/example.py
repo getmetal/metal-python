@@ -16,8 +16,8 @@ def main():
     # metal.index({ "id": "666", "text": "Ozzy" })
     # metal.index({ "id": "668", "text": "Bruce Dickenson" })
     # metal.search({"text": "908", "limit": 1})
-    # results = metal.add_app({"name": "My App"})
-    # print(results)
+    results = metal.add_app({"name": "My App"})
+    print(results)
 
 
 main()
