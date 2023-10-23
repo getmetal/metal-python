@@ -562,7 +562,7 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[0][1], "v1/apps")
         self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_app_name)
 
-    def test_metal_get_all_apps(self):
+    def test_metal_get_apps(self):
         metal = Metal(API_KEY, CLIENT_ID)
         metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
         metal.get_apps()

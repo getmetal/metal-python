@@ -546,7 +546,7 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], f"/v1/apps/{mock_app_id}")
 
-    async def test_metal_get_all_apps(self):
+    async def test_metal_get_apps(self):
         metal = Metal(API_KEY, CLIENT_ID)
         metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=200))
         await metal.get_apps()
