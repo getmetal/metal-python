@@ -510,3 +510,47 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/index-id/queries")
+
+    async def test_metal_add_app(self):
+        mock_app_name = "TestApp"
+        payload = {
+            "name": mock_app_name,
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=201))
+        await metal.add_app(payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+
+        self.assertEqual(metal.request.call_args[0][0], "post")
+        self.assertEqual(metal.request.call_args[0][1], "v1/apps")
+        self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_app_name)
+
+    async def test_metal_get_app(self):
+        mock_app_id = "a" * 24
+        mock_response_data = {
+            "data": {
+                "id": mock_app_id,
+                "name": "Test App"
+            }
+        }
+        metal = Metal(API_KEY, CLIENT_ID)
+
+        return_value = mock.MagicMock(json=lambda: mock_response_data)
+        metal.request = mock.AsyncMock(return_value=return_value)
+
+        await metal.get_app(mock_app_id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], f"/v1/apps/{mock_app_id}")
+
+    async def test_metal_get_apps(self):
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.AsyncMock(return_value=mock.Mock(status_code=200))
+        await metal.get_apps()
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/apps")

@@ -94,3 +94,7 @@ class CreateIndexPayload(TypedDict):
 
 class UpdateIndexPayload(TypedDict):
     status: IndexStatus
+
+
+class CreateAppPayload(TypedDict):
+    name: NotRequired[str]
