@@ -509,6 +509,17 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_args[1]["json"]["model"], mock_model)
         self.assertEqual(metal.request.call_args[1]["json"]["filters"], mock_filters)
 
+    def test_metal_get_index(self):
+        mock_index_id = "test_index"
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
+        metal.get_index(mock_index_id)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "get")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/indexes/test_index")
+
     def test_metal_update_index_with_payload(self):
         mock_index_id = "test_index"
         payload = {
@@ -589,3 +600,20 @@ class TestMetal(TestCase):
         self.assertEqual(metal.request.call_count, 1)
         self.assertEqual(metal.request.call_args[0][0], "get")
         self.assertEqual(metal.request.call_args[0][1], f"/v1/apps/{mock_app_id}")
+
+    def test_metal_update_app(self):
+        mock_app_id = "test_app"
+        payload = {
+            "name": "Updated App Name",
+            "indexes": ["index-id"]
+        }
+
+        metal = Metal(API_KEY, CLIENT_ID)
+        metal.request = mock.MagicMock(return_value=mock.Mock(status_code=200))
+        metal.update_app(mock_app_id, payload)
+
+        self.assertEqual(metal.request.call_count, 1)
+        self.assertEqual(metal.request.call_args[0][0], "put")
+        self.assertEqual(metal.request.call_args[0][1], "/v1/apps/test_app")
+        self.assertEqual(metal.request.call_args[1]["json"]["name"], "Updated App Name")
+        self.assertEqual(metal.request.call_args[1]["json"]["indexes"][0], "index-id")

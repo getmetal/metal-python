@@ -98,3 +98,8 @@ class UpdateIndexPayload(TypedDict):
 
 class CreateAppPayload(TypedDict):
     name: NotRequired[str]
+
+
+class UpdateAppPayload(TypedDict):
+    name: NotRequired[str]
+    indexes: NotRequired[List[str]]
