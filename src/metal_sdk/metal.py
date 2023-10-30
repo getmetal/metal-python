@@ -11,6 +11,7 @@ from .typings import (
     CreateIndexPayload,
     UpdateIndexPayload,
     CreateAppPayload,
+    UpdateAppPayload,
 )
 import logging
 
@@ -435,4 +436,12 @@ class Metal(httpx.Client):
         url = "/v1/apps"
 
         res = self.fetch("get", url, None)
+        return res
+
+    def update_app(self, app_id: str, payload: UpdateAppPayload) -> dict:
+        if not app_id:
+            raise TypeError("app_id required")
+
+        url = f"/v1/apps/{app_id}"
+        res = self.fetch("put", url, payload)
         return res
