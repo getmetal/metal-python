@@ -401,7 +401,7 @@ class Metal(httpx.AsyncClient):
             raise TypeError("index_id is required")
 
         url = f"/v1/indexes/{index_id}"
-        res = await self.fetch("get", url)
+        res = await self.fetch("get", url, None)
         return res
 
     async def update_index(self, index_id: str, payload: UpdateIndexPayload) -> dict:

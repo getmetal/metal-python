@@ -406,7 +406,7 @@ class Metal(httpx.Client):
             raise TypeError("index_id is required")
 
         url = f"/v1/indexes/{index_id}"
-        res = self.fetch("get", url)
+        res = self.fetch("get", url, None)
         return res
 
     def update_index(self, index_id: str, payload: UpdateIndexPayload) -> dict:
