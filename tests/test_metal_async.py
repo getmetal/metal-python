@@ -524,8 +524,10 @@ class TestMetal(IsolatedAsyncioTestCase):
 
     async def test_metal_add_app(self):
         mock_app_name = "TestApp"
+        mock_index_id = "index-id"
         payload = {
             "name": mock_app_name,
+            "indexes": [mock_index_id]
         }
 
         metal = Metal(API_KEY, CLIENT_ID)
@@ -537,6 +539,7 @@ class TestMetal(IsolatedAsyncioTestCase):
         self.assertEqual(metal.request.call_args[0][0], "post")
         self.assertEqual(metal.request.call_args[0][1], "v1/apps")
         self.assertEqual(metal.request.call_args[1]["json"]["name"], mock_app_name)
+        self.assertEqual(metal.request.call_args[1]["json"]["indexes"], [mock_index_id])
 
     async def test_metal_get_app(self):
         mock_app_id = "a" * 24
