@@ -192,7 +192,11 @@ class Metal(httpx.AsyncClient):
         url = "/v1/indexes/" + index + "/documents/" + id_str
 
         res = await self.fetch("get", url, None)
-        return res
+
+        if isinstance(res, list):
+            return res
+        else:
+            return [res]
 
     async def delete_one(self, id: str, index_id=None):
         index = index_id or self.index_id
